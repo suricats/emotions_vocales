@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1 class="title">
+        <h1 class="record-title">
             Mes Emotions
         </h1>
         <div class="title-container">
@@ -12,21 +12,28 @@
                 <img class="img-record" v-bind:class="{ 'recording': isRecording }" :src="'microphone.png'" v-on:click="OnClickRecord">
             </div>
             <div id="audio" class="player-wrapper">
-                <audio-player file=this.audio></audio-player>
+                <audio-player :file="audio" ref="player"></audio-player>
             </div>
         </div>
+        <div class="submit-container">
         <button class="buton-validate" v-on:click="$emit('analyse', audio)">
             Annalyser
         </button>
+        </div>
     </div>
 </template>
 
 
 <script>
+import AudioPlayer from '@/components/AudioPlayer.vue'
+
+
 export default {
     data: function () {
         return {
             audio: Object,
+            audioUrl: "",
+            audioMP3: Object,
             isRecording: false,
             recordingData: [],
             mediaRecorder: null
@@ -45,24 +52,22 @@ export default {
                     audio: true,
                     video: false
                     },function(stream) {
-                        //var options = {mimeType: 'audio/x-wav'};
-                        that.mediaRecorder = new MediaRecorder(stream);
-                        //that.mediaRecorder.setAudioSamplingRate(11025);
-                        //that.mediaRecorder.setAudioChannels(1);
+                        var options = {
+                            mimeType : 'audio/ogg'
+                        }    
+                        that.mediaRecorder = new MediaRecorder(stream, options);
                         that.mediaRecorder.start();
                         that.isRecording = true
-                        console.log("Recording...")
                         that.mediaRecorder.ondataavailable = function(event) {
                             that.recordingData.push(event.data);
                         }
                         that.mediaRecorder.onstop = function(event) {
-                            console.log('Media recorder stopped ' + event);
-                            that.mediaRecorder.stop();
                             that.isRecording = false;
-                            const blob = new Blob(that.recordingData, { type: 'audio/wav'});
-                            that.audio = that.blobToFile(blob, "audio.wav")
-                            //that.audio = window.URL.createObjectURL(blob);
-                            console.log("audio : " + that.audio);
+                            const blob = new Blob(that.recordingData, {type : 'audio/ogg'});
+                            that.audio = that.blobToFile(blob, "audio")
+                            that.audioUrl = URL.createObjectURL(blob);
+                            
+                            that.audioRecorded(that.audioUrl)
                         }
                     },function(error) {
                         alert("Vous devez autoriser l'application à accèder à votre microphone " + error);
@@ -77,6 +82,9 @@ export default {
             theBlob.lastModifiedDate = new Date();
             theBlob.name = fileName;
             return theBlob;
+        },
+        audioRecorded() {
+            this.$refs.player.audioRecorded()
         }
     }
 }
@@ -96,14 +104,17 @@ body {
     justify-content: center;
 }
 
-.title {
+.record-title {
+    font-size: 30px;
+    margin-top: 30px;
     text-align: center;
     color: #008991
 }
 
 .title-secondary {
+    text-align: left;
     margin-top: 50px;
-    width : 75%;
+    width : 70%;
     color: #535353;
 }
 
@@ -123,16 +134,37 @@ body {
 }
 
 .recording {
-    border-radius: 50%;
-    padding: 30px;
-    border: 5px solid #de1300;
+    padding: 10px;
+    border: 3px solid #de1300 !important;
 }
 
 .img-record {
     border-radius: 50%;
-    height: 150px;
-    width: 150px;
+    padding: 5px;
+    border: 2px solid #009157;
+    height: 120px;
+    width: 120px;
 }
 
+.player-wrapper {
+    margin-left: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
+.submit-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.buton-validate {
+    margin-top: 30px;
+    height: 30px;
+    width: 100px; 
+    background-color: #de1300;
+    color: #ffffff;
+    border-radius: 10%;
+}
 </style>
