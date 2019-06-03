@@ -1,41 +1,49 @@
 
 <template>
     <div class="audio-container">
-        <p> {{audio.currentTime}} </p>
-        <div v-if="isPlaying" >
-            <img class="icon" :src="'pause.png'"/>
+        <!--<audio
+        controls
+        :src="audioObject">
+            Your browser does not support the
+            <code>audio</code> element.
+        </audio>-->
+        <div v-if="!audioObject.paused">
+            <img class="icon" :src="'pause.png'" v-on:click="pauseAudio"/>
         </div>
-        <div v-else >
-            <img class="icon" :src="'play.png'">
+        <div v-else>
+            <img class="icon" :src="'play.png'" v-on:click="playAudio">
         </div>
         <div class="sound-line">
             <v-slider
-                v-model="timePlaying"
+                :value="audioObject.currentTime"
             ></v-slider>
         </div>
-        <p> {{audio.duration}} </p>
     </div>
 </template>
 
 
 <script>
 export default {
-    props: ['file'],
     data: function () {
         return {
             isPlaying: false,
             timePlaying: 0,
-            audio: Object
+            audioObject: null
         }
     },
     methods: {
-        audioRecorded(blobURL) {
-            this.audio = new Audio(blobURL);
-            this.audio.play()
-            console.log("i create the audio : " + this.audio.currentSrc)
+        audioRecorded(audioUrl) {
+            this.audioObject = new Audio(audioUrl);
+            console.log(audioUrl)
+            this.audioObject.src = audioUrl;
+            this.audioObject.controls = true;
+            //this.audioObject.play()
         },
         playAudio() {
-
+            this.audioObject.play()            
+        },
+        pauseAudio() {
+            this.audioObject.pause()
         }
     }
 }

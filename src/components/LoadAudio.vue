@@ -12,13 +12,13 @@
                 <img class="img-record" v-bind:class="{ 'recording': isRecording }" :src="'microphone.png'" v-on:click="OnClickRecord">
             </div>
             <div id="audio" class="player-wrapper">
-                <audio-player :file="audio" ref="player"></audio-player>
+                <audio-player ref="player"></audio-player>
             </div>
         </div>
-        <div class="submit-container">
-        <button class="buton-validate" v-on:click="$emit('analyse', audio)">
-            Annalyser
-        </button>
+        <div class="submit-container" v-if="audioUrl">
+            <button class="buton-validate" v-on:click="$emit('analyse', audioFile)">
+                Annalyser
+            </button>
         </div>
     </div>
 </template>
@@ -31,9 +31,9 @@ import AudioPlayer from '@/components/AudioPlayer.vue'
 export default {
     data: function () {
         return {
-            audio: Object,
+            audioFile: Object,
             audioUrl: "",
-            audioMP3: Object,
+            audio: Object,
             isRecording: false,
             recordingData: [],
             mediaRecorder: null
@@ -52,8 +52,11 @@ export default {
                     audio: true,
                     video: false
                     },function(stream) {
+                        /* Prioriser les types de fichiers audio, vérifier le premier supporté par le navigateur */
+                        const mime = ['audio/ogg', 'audio/wav', 'audio/webm', 'audio/ogg']
+                            .filter(MediaRecorder.isTypeSupported)[0];
                         var options = {
-                            mimeType : 'audio/ogg'
+                            mimeType : mime
                         }    
                         that.mediaRecorder = new MediaRecorder(stream, options);
                         that.mediaRecorder.start();
@@ -63,10 +66,11 @@ export default {
                         }
                         that.mediaRecorder.onstop = function(event) {
                             that.isRecording = false;
-                            const blob = new Blob(that.recordingData, {type : 'audio/ogg'});
-                            that.audio = that.blobToFile(blob, "audio")
+                            const blob = new Blob(that.recordingData, {'type' : 'audio/ogg; codecs=opus'});
+                            that.audioFile = that.blobToFile(blob, "audio")
                             that.audioUrl = URL.createObjectURL(blob);
-                            
+                            that.audio = new Audio(that.audioUrl);
+                            //that.audio.play()
                             that.audioRecorded(that.audioUrl)
                         }
                     },function(error) {
@@ -83,8 +87,8 @@ export default {
             theBlob.name = fileName;
             return theBlob;
         },
-        audioRecorded() {
-            this.$refs.player.audioRecorded()
+        audioRecorded(audio) {
+            this.$refs.player.audioRecorded(audio)
         }
     }
 }
@@ -154,6 +158,7 @@ body {
 }
 
 .submit-container {
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -162,7 +167,7 @@ body {
 .buton-validate {
     margin-top: 30px;
     height: 30px;
-    width: 100px; 
+    width: 120px; 
     background-color: #de1300;
     color: #ffffff;
     border-radius: 10%;

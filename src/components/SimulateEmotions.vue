@@ -36,11 +36,4 @@ export default {
 
 <style>
 
-.buton-validate {
-    margin-top: 30px;
-    height : 30px;
-    background-color: #de1300;
-    color: #ffffff;
-}
-
 </style>
