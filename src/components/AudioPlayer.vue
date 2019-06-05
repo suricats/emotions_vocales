@@ -1,6 +1,6 @@
 
 <template>
-    <div class="audio-container">
+    <div class="audio-container" v-if="audioObject">
         <!--<audio
         controls
         :src="audioObject">
@@ -14,9 +14,10 @@
             <img class="icon" :src="'play.png'" v-on:click="playAudio">
         </div>
         <div class="sound-line">
+            <!--<input type="range" id="volume-bar" min="0" max="10" step="1" v-model="audioObject.currentTime">-->
             <v-slider
-                :value="audioObject.currentTime"
-            ></v-slider>
+                v-model="audioObject.currentTime"
+          ></v-slider>
         </div>
     </div>
 </template>

@@ -1,32 +1,39 @@
 <template>
     <div>
-        <h1 class="record-title">
-            Mes Emotions
+        <h1 class="load-title">
+            Notre librairie
         </h1>
         <div class="title-container">
-            <h3 class="title-secondary"> Ici vous pouvez vous enregistrer et écouter votre enregistrement. Lorsque vous êtes prêts,
-                soumetez le et observez l'évolution de vos émotions ! </h3>
+            <h3 class="title-secondary"> Nous avons séléctionné pour vous un ensemble d'éxtraits pour vous permettre de tester facilement la reconnaissance d'émotions vocales ! </h3>
         </div>
-        <div class="record-container">
-            <div class="btn-record">
-                <img class="img-record" v-bind:class="{ 'recording': isRecording }" :src="'microphone.png'" v-on:click="OnClickRecord">
-            </div>
+        <div class="load-audio-container">
             <div id="audio" class="player-wrapper">
                 <audio-player ref="player"></audio-player>
             </div>
+            <ul id="audio-list">
+                <li v-for="audio in audioList" v-on:click="audioRecorded(audio)" class="audio-item">
+                    {{ audio.innerText }}
+                </li>
+            </ul>
         </div>
         <div class="submit-container" v-if="audioUrl">
-            <button class="buton-validate" v-on:click="$emit('analyse', audioFile)">
+            <button class="buton-validate" v-on:click="SimulateEmotions">
                 Annalyser
             </button>
+        </div>
+        <div class="score-container">
+            <analyser ref="analyser"></analyser>
         </div>
     </div>
 </template>
 
 
 <script>
+import anger1 from '../assets/audio/anger9.wav'
+import anger2 from '../assets/audio/anger10.wav'
+import anger3 from '../assets/audio/anger11.wav'
 import AudioPlayer from '@/components/AudioPlayer.vue'
-
+import Analyser from '@/components/Analyser.vue'
 
 export default {
     data: function () {
@@ -34,66 +41,156 @@ export default {
             audioFile: Object,
             audioUrl: "",
             audio: Object,
-            isRecording: false,
-            recordingData: [],
-            mediaRecorder: null
+            audioList: []
         }
     },
+    created: function() {
+        this.getAudios();
+    },
     components: {
-        AudioPlayer
+        AudioPlayer,
+        Analyser
     },
     methods: {
-        OnClickRecord() {
-            /* eslint-disable no-console */
-            if (!this.isRecording) {
-                const that = this;
-                navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-                navigator.getUserMedia({
-                    audio: true,
-                    video: false
-                    },function(stream) {
-                        /* Prioriser les types de fichiers audio, vérifier le premier supporté par le navigateur */
-                        const mime = ['audio/ogg', 'audio/wav', 'audio/webm', 'audio/ogg']
-                            .filter(MediaRecorder.isTypeSupported)[0];
-                        var options = {
-                            mimeType : mime
-                        }    
-                        that.mediaRecorder = new MediaRecorder(stream, options);
-                        that.mediaRecorder.start();
-                        that.isRecording = true
-                        that.mediaRecorder.ondataavailable = function(event) {
-                            that.recordingData.push(event.data);
-                        }
-                        that.mediaRecorder.onstop = function(event) {
-                            that.isRecording = false;
-                            const blob = new Blob(that.recordingData, {'type' : 'audio/ogg; codecs=opus'});
-                            that.audioFile = that.blobToFile(blob, "audio")
-                            that.audioUrl = URL.createObjectURL(blob);
-                            that.audio = new Audio(that.audioUrl);
-                            //that.audio.play()
-                            that.audioRecorded(that.audioUrl)
-                        }
-                    },function(error) {
-                        alert("Vous devez autoriser l'application à accèder à votre microphone " + error);
-                    });
-            } else {
-                this.isRecording = false;
-                this.mediaRecorder.stop();
-                console.log("Stop Recording")
-            }
+        getAudios() {
+            this.audioList.push(new Audio(anger1));
+            this.audioList[this.audioList.length - 1].type = 'audio/wav';
+            this.audioList[this.audioList.length - 1].innerText = "angry woman";
+            this.audioList.push(new Audio(anger2));
+            this.audioList[this.audioList.length - 1].innerText = "really angry woman";
+            this.audioList.push(new Audio(anger3));
+            this.audioList[this.audioList.length - 1].innerText = "over angry woman";
         },
-        blobToFile(theBlob, fileName){
+        audioRecorded(audio) {
+            this.audioUrl = audio.src
+            this.$refs.player.audioRecorded(audio.src)
+        },
+        blobToFile(theBlob, fileName) {
             theBlob.lastModifiedDate = new Date();
             theBlob.name = fileName;
             return theBlob;
         },
-        audioRecorded(audio) {
-            this.$refs.player.audioRecorded(audio)
+        dataURItoBlob(dataURI) {
+            // convert base64/URLEncoded data component to raw binary data held in a string
+            var byteString;
+            if (dataURI.split(',')[0].indexOf('base64') >= 0)
+                byteString = atob(dataURI.split(',')[1]);
+            else
+                byteString = unescape(dataURI.split(',')[1]);
+
+            // separate out the mime component
+            var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+            // write the bytes of the string to a typed array
+            var ia = new Uint8Array(byteString.length);
+            for (var i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+
+            return new Blob([ia], {type: 'audio/wav'});
+        },
+        initialize(data) {
+            this.$refs.analyser.initialize(data)
+        },
+        async SimulateEmotions () {
+            /* eslint-disable no-console */
+            //var file = new File([this.audio], "audio.wav", {type: contentType, lastModified: Date.now()});
+
+
+
+            /*let formData = new FormData();
+
+            let blob = await fetch(this.audioUrl).then(r => r.blob());
+            
+            formData.append("wav", this.blobToFile(blob, "audio"));
+            formData.append("apikey", process.env.VUE_APP_API_KEY);
+
+            var url = new URL(process.env.VUE_APP_API_URL)
+
+
+            console.log(url)
+            fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData,
+            }).then(function(response) {
+                console.log(response.status)
+                    response.json().then(function(json){
+                        console.log(json);
+                    })
+            });*/
+
+            // the response is a promise
+            
+
+
+            /*var fs = require('fs');
+            var request = require('request');
+            const API_ENDPOINT = 'https://api.webempath.net/v2/analyzeWav';
+
+            let blob = await fetch(this.audioUrl).then(r => r.blob());
+
+            var formData = {
+            apikey: process.env.VUE_APP_API_KEY,
+            wav: this.blobToFile(blob, "audio")
+            };
+            request.post({ url: process.env.VUE_APP_API_URL, formData: formData }, function(err, response) {
+                if (err) {
+
+                    console.trace(err);
+                } else {
+
+                    var respBody = JSON.parse(response.body);
+
+                    console.log("result: " + JSON.stringify(respBody));
+                }
+            });*/
+
+            /*var formData = new FormData();
+
+            let blob = await fetch(this.audioUrl).then(r => r.blob());
+            
+            formData.append("wav", this.blobToFile(blob, "audio"));
+            console.log(blob)
+
+            formData.append("apikey", process.env.VUE_APP_API_KEY);
+
+            const req = new XMLHttpRequest();
+            req.open('POST',  process.env.VUE_APP_API_URL, false);
+            req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            req.onload = function (e) {
+            if (req.readyState === 4) {
+                if (req.status === 200) {
+                console.log(req.responseText);
+                } else {
+                console.error(req.statusText);
+                }
+            }
+            };
+            req.send(formData);*/
+            
+            console.log("apikey : " + process.env.VUE_APP_API_KEY);
+            var formData = new FormData();
+
+            let blob = await fetch(this.audioUrl).then(r => r.blob());
+            
+            formData.append("wav", this.blobToFile(blob, "audio"));
+            console.log(blob)
+
+            formData.append("apikey", process.env.VUE_APP_API_KEY);
+            var response;
+            try {
+                response = await this.$http.post('',formData)
+                console.log(response)
+                console.log(response.data)
+                this.initialize(response.data)
+            } catch (e) {
+                console.log(e)
+            }
         }
     }
 }
 </script>
-
 <style>
 
 html,
@@ -108,7 +205,7 @@ body {
     justify-content: center;
 }
 
-.record-title {
+.load-title {
     font-size: 30px;
     margin-top: 30px;
     text-align: center;
@@ -122,43 +219,8 @@ body {
     color: #535353;
 }
 
-.record-container {
-    display: flex;
-    align-items: column;
-    justify-content: center;
-}
-
-.btn-record {
-    margin-top: 30px;
-    height: 100%;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.recording {
-    padding: 10px;
-    border: 3px solid #de1300 !important;
-}
-
-.img-record {
-    border-radius: 50%;
-    padding: 5px;
-    border: 2px solid #009157;
-    height: 120px;
-    width: 120px;
-}
-
-.player-wrapper {
-    margin-left: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 .submit-container {
-    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -171,5 +233,36 @@ body {
     background-color: #de1300;
     color: #ffffff;
     border-radius: 10%;
+}
+
+.load-audio-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#audio-list {
+    width: 20%;
+    margin-left: 30px;
+}
+
+.audio-item {
+    border-bottom: 1px solid #535353;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    list-style-type: none;
+}
+.player-wrapper {
+    margin-left: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.score-container {
+    margin-top: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 </style>

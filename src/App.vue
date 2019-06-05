@@ -1,16 +1,16 @@
 <template>
   <v-app>
-    <simulate-emotions/>
+    <load-audio/>
   </v-app>
 </template>
 
 <script>
-import SimulateEmotions from './components/SimulateEmotions'
+import LoadAudio from './components/LoadAudio'
 
 export default {
   name: 'App',
   components: {
-    SimulateEmotions
+    LoadAudio
   },
   data () {
     return {
