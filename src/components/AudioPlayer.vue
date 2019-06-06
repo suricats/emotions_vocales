@@ -1,23 +1,18 @@
 
 <template>
-    <div class="audio-container" v-if="audioObject">
-        <!--<audio
-        controls
-        :src="audioObject">
-            Your browser does not support the
-            <code>audio</code> element.
-        </audio>-->
+    <div class="audio-container" v-if="created">
         <div v-if="!audioObject.paused">
             <img class="icon" :src="'pause.png'" v-on:click="pauseAudio"/>
         </div>
         <div v-else>
             <img class="icon" :src="'play.png'" v-on:click="playAudio">
         </div>
-        <div class="sound-line">
-            <!--<input type="range" id="volume-bar" min="0" max="10" step="1" v-model="audioObject.currentTime">-->
-            <v-slider
+        <div id="sound-line" class="sound-line">
+            <v-slider 
                 v-model="audioObject.currentTime"
           ></v-slider>
+        </div>
+        <div id="sound-duration">
         </div>
     </div>
 </template>
@@ -29,16 +24,20 @@ export default {
         return {
             isPlaying: false,
             timePlaying: 0,
-            audioObject: null
+            audioObject: null,
+            created: false
         }
     },
     methods: {
         audioRecorded(audioUrl) {
             this.audioObject = new Audio(audioUrl);
-            console.log(audioUrl)
             this.audioObject.src = audioUrl;
             this.audioObject.controls = true;
-            //this.audioObject.play()
+            const that = this;
+            this.audioObject.addEventListener("loadeddata", function() {
+                that.created = true;                
+            });
+            
         },
         playAudio() {
             this.audioObject.play()            

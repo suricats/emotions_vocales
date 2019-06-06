@@ -1,16 +1,17 @@
 <template>
   <v-app>
-    <load-audio/>
+    <navbar></navbar>
+    <router-view></router-view>
   </v-app>
 </template>
 
 <script>
-import LoadAudio from './components/LoadAudio'
+import Navbar from './components/Navbar'
 
 export default {
   name: 'App',
   components: {
-    LoadAudio
+    Navbar
   },
   data () {
     return {

@@ -11,7 +11,7 @@
                 <audio-player ref="player"></audio-player>
             </div>
             <ul id="audio-list">
-                <li v-for="audio in audioList" v-on:click="audioRecorded(audio)" class="audio-item">
+                <li v-for="audio in audioList" v-bind:key="audio" v-on:click="audioRecorded(audio)" class="audio-item">
                     {{ audio.innerText }}
                 </li>
             </ul>
@@ -32,6 +32,13 @@
 import anger1 from '../assets/audio/anger9.wav'
 import anger2 from '../assets/audio/anger10.wav'
 import anger3 from '../assets/audio/anger11.wav'
+import sad1 from '../assets/audio/sad8.wav'
+import sad2 from '../assets/audio/sad10.wav'
+import joy1 from '../assets/audio/joy5.wav'
+import joy2 from '../assets/audio/joy7.wav'
+import joy3 from '../assets/audio/joy8.wav'
+
+
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import Analyser from '@/components/Analyser.vue'
 
@@ -54,12 +61,24 @@ export default {
     methods: {
         getAudios() {
             this.audioList.push(new Audio(anger1));
-            this.audioList[this.audioList.length - 1].type = 'audio/wav';
             this.audioList[this.audioList.length - 1].innerText = "angry woman";
             this.audioList.push(new Audio(anger2));
             this.audioList[this.audioList.length - 1].innerText = "really angry woman";
             this.audioList.push(new Audio(anger3));
             this.audioList[this.audioList.length - 1].innerText = "over angry woman";
+
+            this.audioList.push(new Audio(sad1));
+            this.audioList[this.audioList.length - 1].innerText = "sad woman";
+            this.audioList.push(new Audio(sad2));
+            this.audioList[this.audioList.length - 1].innerText = "sad man";
+
+
+            this.audioList.push(new Audio(joy1));
+            this.audioList[this.audioList.length - 1].innerText = "happy man";
+            this.audioList.push(new Audio(joy2));
+            this.audioList[this.audioList.length - 1].innerText = "happy woman";
+            this.audioList.push(new Audio(joy3));
+            this.audioList[this.audioList.length - 1].innerText = "really happy man";
         },
         audioRecorded(audio) {
             this.audioUrl = audio.src
@@ -70,6 +89,7 @@ export default {
             theBlob.name = fileName;
             return theBlob;
         },
+        // This funtion was totally stolen (or collectivized according to your political opinion)
         dataURItoBlob(dataURI) {
             // convert base64/URLEncoded data component to raw binary data held in a string
             var byteString;
@@ -79,7 +99,7 @@ export default {
                 byteString = unescape(dataURI.split(',')[1]);
 
             // separate out the mime component
-            var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            dataURI.split(',')[0].split(':')[1].split(';')[0];
 
             // write the bytes of the string to a typed array
             var ia = new Uint8Array(byteString.length);
@@ -93,99 +113,19 @@ export default {
             this.$refs.analyser.initialize(data)
         },
         async SimulateEmotions () {
-            /* eslint-disable no-console */
-            //var file = new File([this.audio], "audio.wav", {type: contentType, lastModified: Date.now()});
-
-
-
-            /*let formData = new FormData();
-
-            let blob = await fetch(this.audioUrl).then(r => r.blob());
-            
-            formData.append("wav", this.blobToFile(blob, "audio"));
-            formData.append("apikey", process.env.VUE_APP_API_KEY);
-
-            var url = new URL(process.env.VUE_APP_API_URL)
-
-
-            console.log(url)
-            fetch(url, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: formData,
-            }).then(function(response) {
-                console.log(response.status)
-                    response.json().then(function(json){
-                        console.log(json);
-                    })
-            });*/
-
-            // the response is a promise
-            
-
-
-            /*var fs = require('fs');
-            var request = require('request');
-            const API_ENDPOINT = 'https://api.webempath.net/v2/analyzeWav';
-
-            let blob = await fetch(this.audioUrl).then(r => r.blob());
-
-            var formData = {
-            apikey: process.env.VUE_APP_API_KEY,
-            wav: this.blobToFile(blob, "audio")
-            };
-            request.post({ url: process.env.VUE_APP_API_URL, formData: formData }, function(err, response) {
-                if (err) {
-
-                    console.trace(err);
-                } else {
-
-                    var respBody = JSON.parse(response.body);
-
-                    console.log("result: " + JSON.stringify(respBody));
-                }
-            });*/
-
-            /*var formData = new FormData();
-
-            let blob = await fetch(this.audioUrl).then(r => r.blob());
-            
-            formData.append("wav", this.blobToFile(blob, "audio"));
-            console.log(blob)
-
-            formData.append("apikey", process.env.VUE_APP_API_KEY);
-
-            const req = new XMLHttpRequest();
-            req.open('POST',  process.env.VUE_APP_API_URL, false);
-            req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            req.onload = function (e) {
-            if (req.readyState === 4) {
-                if (req.status === 200) {
-                console.log(req.responseText);
-                } else {
-                console.error(req.statusText);
-                }
-            }
-            };
-            req.send(formData);*/
-            
-            console.log("apikey : " + process.env.VUE_APP_API_KEY);
+            /* eslint-disable no-console */  
             var formData = new FormData();
 
             let blob = await fetch(this.audioUrl).then(r => r.blob());
             
             formData.append("wav", this.blobToFile(blob, "audio"));
-            console.log(blob)
-
             formData.append("apikey", process.env.VUE_APP_API_KEY);
-            var response;
+
             try {
-                response = await this.$http.post('',formData)
-                console.log(response)
-                console.log(response.data)
+                const response = await this.$http.post('',formData)
                 this.initialize(response.data)
             } catch (e) {
-                console.log(e)
+                console.log(e) // Maybe in the futur it will be an alert
             }
         }
     }
@@ -242,7 +182,7 @@ body {
 }
 
 #audio-list {
-    width: 20%;
+    width: 30%;
     margin-left: 30px;
 }
 
@@ -251,6 +191,7 @@ body {
     margin-top: 10px;
     margin-bottom: 10px;
     list-style-type: none;
+    font-size: 15px;
 }
 .player-wrapper {
     margin-left: 30px;

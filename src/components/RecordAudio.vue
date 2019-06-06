@@ -48,16 +48,15 @@ export default {
     },
     methods: {
         OnClickRecord() {
+            this.recordingData = [];
             /* eslint-disable no-console */
             if (!this.isRecording) {
                 const that = this;
                 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
                 navigator.getUserMedia({
-                    audio: true,
-                    video: false
+                    audio: { channelCount: 1, sampleRate: 11025, sampleSize: 16}
                     },function(stream) {
-                        /* Prioriser les types de fichiers audio, vérifier le premier supporté par le navigateur */
-                        const mime = ['audio/ogg', 'audio/wav', 'audio/webm', 'audio/ogg']
+                        const mime = ['audio/wav'] 
                             .filter(MediaRecorder.isTypeSupported)[0];
                         var options = {
                             mimeType : mime
@@ -69,14 +68,20 @@ export default {
                             that.recordingData.push(event.data);
                         }
                         that.mediaRecorder.onstop = function(event) {
+                            //console.log(event)
                             that.isRecording = false;
                             const blob = new Blob(that.recordingData, {'type' : 'audio/wav'});
-                            that.audioFile = that.blobToFile(blob, "audio")
-                            console.log("this is not supposed to be a blob " + that.audioFile)
+
                             that.audioUrl = URL.createObjectURL(blob);
                             that.audio = new Audio(that.audioUrl);
-                            //that.audio.play()
-                            that.audioRecorded(that.audioUrl)
+                            // This will modify the sample rate 
+                            const resampler = require('audio-resampler');
+                            resampler(that.audioUrl, 11025, function(event){
+                                event.getFile(function(fileEvent){
+                                    that.audioUrl = fileEvent;
+                                    that.audioRecorded(that.audioUrl)   
+                                });
+                            });
                         }
                     },function(error) {
                         alert("Vous devez autoriser l'application à accèder à votre microphone " + error);
@@ -84,7 +89,6 @@ export default {
             } else {
                 this.isRecording = false;
                 this.mediaRecorder.stop();
-                console.log("Stop Recording")
             }
         },
         blobToFile(theBlob, fileName){
@@ -99,20 +103,20 @@ export default {
             this.$refs.analyser.initialize(data)
         },
         async SimulateEmotions () {
-            /* eslint-disable no-console */
-            //var file = new File([this.audio], "audio.wav", {type: contentType, lastModified: Date.now()});
-            console.log("apikey : " + process.env.VUE_APP_API_KEY);
-            console.log("audio : " + this.audioFile);
+
             var formData = new FormData();
+
+            let blob = await fetch(this.audioUrl).then(r => r.blob());
+            
+            formData.append("wav", this.blobToFile(blob, "audio"));
             formData.append("apikey", process.env.VUE_APP_API_KEY);
-            formData.append("wav", this.audioFile);
-             try {
+
+            var response;
+            try {
                 response = await this.$http.post('',formData)
-                console.log(response)
-                console.log(response.data)
                 this.initialize(response.data)
             } catch (e) {
-                console.log(e)
+                console.log(e) // Maybe in the futur it will be an alert
             }
         }
     }
