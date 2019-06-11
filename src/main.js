@@ -1,12 +1,13 @@
 import Vue from 'vue'
 import App from './App.vue'
-import Axios from '@/plugins/axios.js'
 import Vuetify from 'vuetify'
 import router from './router'
+import axios from '@/plugins/axios.js'
+
 import 'vuetify/dist/vuetify.min.css'
 
 Vue.config.productionTip = false
-Vue.use(Axios)
+Vue.use(axios)
 Vue.use(Vuetify)
 
 

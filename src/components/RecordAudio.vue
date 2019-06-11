@@ -30,6 +30,7 @@
 <script>
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import Analyser from '@/components/Analyser.vue'
+import wav from '@/plugins/wav.js'
 
 export default {
     data: function () {
@@ -39,7 +40,9 @@ export default {
             audio: Object,
             isRecording: false,
             recordingData: [],
-            mediaRecorder: null
+            mediaRecorder: null,
+            start: null,
+            duration: 0
         }
     },
     components: {
@@ -62,24 +65,28 @@ export default {
                             mimeType : mime
                         }    
                         that.mediaRecorder = new MediaRecorder(stream, options);
+                        that.start = Date.now();
+                        console.log("start recording : " + that.start)
                         that.mediaRecorder.start();
                         that.isRecording = true
                         that.mediaRecorder.ondataavailable = function(event) {
                             that.recordingData.push(event.data);
                         }
                         that.mediaRecorder.onstop = function(event) {
-                            //console.log(event)
                             that.isRecording = false;
+                            that.duration = Math.floor((Date.now() - that.start) / 1000); // Duration in seconds
+                            console.log("duration : " + that.duration)
                             const blob = new Blob(that.recordingData, {'type' : 'audio/wav'});
 
+                            console.log(blob)
                             that.audioUrl = URL.createObjectURL(blob);
-                            that.audio = new Audio(that.audioUrl);
                             // This will modify the sample rate 
                             const resampler = require('audio-resampler');
                             resampler(that.audioUrl, 11025, function(event){
                                 event.getFile(function(fileEvent){
                                     that.audioUrl = fileEvent;
-                                    that.audioRecorded(that.audioUrl)   
+                                    that.audio = new Audio(that.audioUrl);
+                                    that.audioRecorded(that.audio)
                                 });
                             });
                         }
@@ -102,22 +109,47 @@ export default {
         initialize(data) {
             this.$refs.analyser.initialize(data)
         },
-        async SimulateEmotions () {
+        async success(wavFile) {
+            var blob = new Blob([wavFile], {type: 'audio/wav'});
+
+            console.log(URL.createObjectURL(blob))
+
 
             var formData = new FormData();
 
-            let blob = await fetch(this.audioUrl).then(r => r.blob());
-            
             formData.append("wav", this.blobToFile(blob, "audio"));
             formData.append("apikey", process.env.VUE_APP_API_KEY);
 
-            var response;
             try {
-                response = await this.$http.post('',formData)
+                const response = await this.$http.post('',formData)
                 this.initialize(response.data)
             } catch (e) {
                 console.log(e) // Maybe in the futur it will be an alert
             }
+        },
+        async SimulateEmotions () {
+            var sStart = 0;
+            var sRead = 0;
+            var duration = this.duration
+            let blob = await fetch(this.audioUrl).then(r => r.blob());
+
+            var wavFile = new wav(blob);
+            this.audio.play()
+            var that = this
+            wavFile.onloadend = function () {
+                while (sStart < duration) {
+                    
+                    if (sStart + 5 > duration) {
+                        sRead = duration - sStart;
+                    } else {
+                        sRead = 5;
+                    }
+
+                    this.slice(sStart, sRead, that.success);
+                    sStart = sStart + sRead
+                }            
+            };
+            
         }
     }
 }

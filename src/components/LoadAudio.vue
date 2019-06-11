@@ -11,7 +11,7 @@
                 <audio-player ref="player"></audio-player>
             </div>
             <ul id="audio-list">
-                <li v-for="audio in audioList" v-bind:key="audio" v-on:click="audioRecorded(audio)" class="audio-item">
+                <li v-for="audio in audioList" v-on:click="audioRecorded(audio)" class="audio-item">
                     {{ audio.innerText }}
                 </li>
             </ul>
@@ -37,10 +37,12 @@ import sad2 from '../assets/audio/sad10.wav'
 import joy1 from '../assets/audio/joy5.wav'
 import joy2 from '../assets/audio/joy7.wav'
 import joy3 from '../assets/audio/joy8.wav'
+import discours from '../assets/audio/discours.wav'
 
 
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import Analyser from '@/components/Analyser.vue'
+import wav from '@/plugins/wav.js'
 
 export default {
     data: function () {
@@ -79,10 +81,15 @@ export default {
             this.audioList[this.audioList.length - 1].innerText = "happy woman";
             this.audioList.push(new Audio(joy3));
             this.audioList[this.audioList.length - 1].innerText = "really happy man";
+
+            this.audioList.push(new Audio(discours));
+            this.audioList[this.audioList.length - 1].innerText = "discours de l'abée Pierre";
         },
         audioRecorded(audio) {
             this.audioUrl = audio.src
-            this.$refs.player.audioRecorded(audio.src)
+            this.audio = new Audio(this.audioUrl);
+            this.$refs.player.audioRecorded(this.audio)
+            this.clean()
         },
         blobToFile(theBlob, fileName) {
             theBlob.lastModifiedDate = new Date();
@@ -112,12 +119,17 @@ export default {
         initialize(data) {
             this.$refs.analyser.initialize(data)
         },
-        async SimulateEmotions () {
-            /* eslint-disable no-console */  
+        clean() {
+            this.$refs.analyser.clean()
+        },
+        async success(wavFile) {
+            var blob = new Blob([wavFile], {type: 'audio/wav'});
+
+            console.log(URL.createObjectURL(blob))
+
+
             var formData = new FormData();
 
-            let blob = await fetch(this.audioUrl).then(r => r.blob());
-            
             formData.append("wav", this.blobToFile(blob, "audio"));
             formData.append("apikey", process.env.VUE_APP_API_KEY);
 
@@ -127,6 +139,31 @@ export default {
             } catch (e) {
                 console.log(e) // Maybe in the futur it will be an alert
             }
+
+        },
+        async SimulateEmotions () {
+            /* eslint-disable no-console */
+            let blob = await fetch(this.audioUrl).then(r => r.blob());
+
+            var wavFile = new wav(blob);
+            this.audio.play()
+            var that = this
+
+            var sStart = 0;
+            var sRead = 0;
+            var duration = this.audio.duration
+
+            wavFile.onloadend = function () {
+                while (sStart < duration) {
+                    if (sStart + 5 > duration) {
+                        sRead = duration - sStart;
+                    } else {
+                        sRead = 5;
+                    }
+                    this.slice(sStart, sRead, that.success);
+                    sStart = sStart + sRead
+                }
+            };
         }
     }
 }
