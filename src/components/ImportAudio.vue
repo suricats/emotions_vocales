@@ -1,22 +1,19 @@
 <template>
     <div>
-        <h1 class="load-title">
-            Notre librairie
+        <h1 class="import-title">
+            Mon audio
         </h1>
         <div class="title-container">
-            <h3 class="title-secondary"> Nous avons séléctionné pour vous un ensemble d'éxtraits pour vous permettre de tester facilement la reconnaissance d'émotions vocales ! </h3>
+            <h3 class="title-secondary"> Un extrait de film ? Une discussion avec votre patron ? Importez le fichier audio de votre choix et annalyser le afin d'en connaitre les émotions vocales ! </h3>
         </div>
         <div class="load-audio-container">
             <div id="audio" class="player-wrapper">
                 <audio-player ref="player"></audio-player>
             </div>
-            <ul id="audio-list">
-                <li v-for="audio in audioList" v-on:click="audioRecorded(audio)" class="audio-item">
-                    {{ audio.innerText }}
-                </li>
-            </ul>
+            <input id="loadFile" type="file"
+                v-on:change="verifyFile"/>
         </div>
-        <div class="submit-container" v-if="audioUrl">
+        <div class="submit-container" >
             <button class="buton-validate" v-on:click="SimulateEmotions">
                 Annalyser
             </button>
@@ -29,15 +26,7 @@
 
 
 <script>
-import anger1 from '../assets/audio/anger9.wav'
-import anger2 from '../assets/audio/anger10.wav'
-import anger3 from '../assets/audio/anger11.wav'
-import sad1 from '../assets/audio/sad8.wav'
-import sad2 from '../assets/audio/sad10.wav'
-import joy1 from '../assets/audio/joy5.wav'
-import joy2 from '../assets/audio/joy7.wav'
-import joy3 from '../assets/audio/joy8.wav'
-import discours from '../assets/audio/discours.wav'
+
 
 
 import AudioPlayer from '@/components/AudioPlayer.vue'
@@ -49,47 +38,38 @@ export default {
         return {
             audioFile: Object,
             audioUrl: "",
-            audio: Object,
-            audioList: []
+            audio: Object
         }
-    },
-    created: function() {
-        this.getAudios();
     },
     components: {
         AudioPlayer,
         Analyser
     },
     methods: {
-        getAudios() {
-            this.audioList.push(new Audio(anger1));
-            this.audioList[this.audioList.length - 1].innerText = "angry woman";
-            this.audioList.push(new Audio(anger2));
-            this.audioList[this.audioList.length - 1].innerText = "really angry woman";
-            this.audioList.push(new Audio(anger3));
-            this.audioList[this.audioList.length - 1].innerText = "over angry woman";
+        verifyFile() {
+            const audioInput = document.getElementById("loadFile");;
 
-            this.audioList.push(new Audio(sad1));
-            this.audioList[this.audioList.length - 1].innerText = "sad woman";
-            this.audioList.push(new Audio(sad2));
-            this.audioList[this.audioList.length - 1].innerText = "sad man";
+            console.log(audioInput)
 
-
-            this.audioList.push(new Audio(joy1));
-            this.audioList[this.audioList.length - 1].innerText = "happy man";
-            this.audioList.push(new Audio(joy2));
-            this.audioList[this.audioList.length - 1].innerText = "happy woman";
-            this.audioList.push(new Audio(joy3));
-            this.audioList[this.audioList.length - 1].innerText = "really happy man";
-
-            this.audioList.push(new Audio(discours));
-            this.audioList[this.audioList.length - 1].innerText = "discours de l'abée Pierre";
+            if (audioInput.value != '' && audioInput.value != undefined && audioInput.files) {
+                var fReader = new FileReader();
+                console.log(audioInput.files[0])
+                fReader.readAsDataURL(audioInput.files[0]);
+                var that = this      
+                fReader.onloadend = function(event){
+                    that.audioUrl = event.target.result;
+                    console.log(this.audioUrl)
+                    that.audio = new Audio(that.audioUrl);
+                    that.$refs.player.audioRecorded(that.audio)
+                    that.clean()
+                    audioInput.type = "file"
+                }
+                
+            }
         },
-        audioRecorded(audio) {
-            this.audioUrl = audio.src
-            this.audio = new Audio(this.audioUrl);
-            this.$refs.player.audioRecorded(this.audio)
-            this.clean()
+        cleanSelected() {
+            document.querySelector('input').value = "";
+            document.querySelector('input').files = ""
         },
         blobToFile(theBlob, fileName) {
             theBlob.lastModifiedDate = new Date();
@@ -149,19 +129,21 @@ export default {
             var sRead = 0;
             var duration = this.audio.duration
 
-            while (sStart < duration) {
-                    
-                    if (sStart + 5 > duration) {
-                        sRead = duration - sStart;
-                    } else {
-                        sRead = 5;
-                    }
-                    
-                    if (sRead === 0) {break;}
+            console.log("duration : " + duration)
 
-                    await wavFile.slice(sStart, sRead, this.success);
-                    await this.sleep(5000)
-                    sStart = sStart + sRead
+            while (sStart < duration) {     
+                if (sStart + 5 > duration) {
+                    sRead = duration - sStart;
+                } else {
+                    sRead = 5;
+                }
+
+                if (sRead === 0) {break;}
+
+                await wavFile.slice(sStart, sRead, this.success);
+                await this.sleep(5000)
+                console.log("start : " + sStart + " SRead : " + sRead)
+                sStart = sStart + sRead
             }
         },
         async SimulateEmotions () {
@@ -197,7 +179,7 @@ body {
     justify-content: center;
 }
 
-.load-title {
+.import-title {
     font-size: 30px;
     margin-top: 30px;
     text-align: center;
@@ -246,7 +228,7 @@ body {
     font-size: 15px;
 }
 .player-wrapper {
-    margin-left: 30px;
+    margin-right: 20px;
     display: flex;
     align-items: center;
     justify-content: center;

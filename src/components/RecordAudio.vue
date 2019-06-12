@@ -127,17 +127,15 @@ export default {
                 console.log(e) // Maybe in the futur it will be an alert
             }
         },
-        async SimulateEmotions () {
+        sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        },
+        async SliceWav(wavFile) {
             var sStart = 0;
             var sRead = 0;
             var duration = this.duration
-            let blob = await fetch(this.audioUrl).then(r => r.blob());
-
-            var wavFile = new wav(blob);
-            this.audio.play()
-            var that = this
-            wavFile.onloadend = function () {
-                while (sStart < duration) {
+            
+            while (sStart < duration) {
                     
                     if (sStart + 5 > duration) {
                         sRead = duration - sStart;
@@ -145,9 +143,22 @@ export default {
                         sRead = 5;
                     }
 
-                    this.slice(sStart, sRead, that.success);
+                    if (sRead === 0) {break;}
+
+                    await wavFile.slice(sStart, sRead, this.success);
+                    await this.sleep(5000)
                     sStart = sStart + sRead
-                }            
+            }
+        },
+        async SimulateEmotions () {
+            
+            let blob = await fetch(this.audioUrl).then(r => r.blob());
+
+            var wavFile = new wav(blob);
+            this.audio.play()
+            var that = this
+            wavFile.onloadend = function () {
+                that.SliceWav(this)
             };
             
         }
