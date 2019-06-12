@@ -53,16 +53,14 @@ export default {
 
             if (audioInput.value != '' && audioInput.value != undefined && audioInput.files) {
                 var fReader = new FileReader();
-                console.log(audioInput.files[0])
                 fReader.readAsDataURL(audioInput.files[0]);
                 var that = this      
                 fReader.onloadend = function(event){
                     that.audioUrl = event.target.result;
-                    console.log(this.audioUrl)
                     that.audio = new Audio(that.audioUrl);
+                    console.log(audio)
                     that.$refs.player.audioRecorded(that.audio)
                     that.clean()
-                    audioInput.type = "file"
                 }
                 
             }
@@ -127,8 +125,15 @@ export default {
         async SliceWav(wavFile) {
             var sStart = 0;
             var sRead = 0;
-            var duration = this.audio.duration
+            var duration;
+            
+            console.log(this.audio)
 
+            if (this.audio.duration === null || this.audio.duration === undefined || this.audio.duration > 30) {
+                duration = 5
+            } else {
+                duration = this.audio.duration;
+            }
             console.log("duration : " + duration)
 
             while (sStart < duration) {     

@@ -5,6 +5,7 @@
             <div class="navbar-fast-link">
                 <router-link class="link" to="/record">Mes Emotions</router-link>
                 <router-link class="link" to="/library">La Librairie</router-link>
+                <router-link class="link" to="/import">Mes Audios</router-link>
             </div>
         </div>
     </nav>

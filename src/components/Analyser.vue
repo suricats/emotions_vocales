@@ -1,10 +1,15 @@
 
 <template>
     <div class="sparkline-container">
-        <canvas id="lineChart" width="100" height="100"></canvas>
-        <canvas id="radarChart" width="100" height="100"></canvas>
-        <canvas id="doughnutChart" width="100" height="100"></canvas>       
-
+        <div class="chart">
+            <canvas id="lineChart" width="100" height="100"></canvas>
+        </div>
+        <div class="chart">
+            <canvas id="radarChart" width="100" height="100"></canvas>
+        </div>
+        <div class="chart">
+            <canvas id="doughnutChart" width="100" height="100"></canvas>
+        </div>
     </div>
 </template>
 
@@ -105,6 +110,8 @@ export default {
             }
             var averageAnger = total / this.anger.length;
 
+            console.log(averageAnger)
+
             total = 0;
             for(var i = 0; i < this.joy.length; i++) {
                 total += this.joy[i];
@@ -171,8 +178,18 @@ export default {
 <style>
 
 .sparkline-container {
+    width: 70%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+
+}
+
+.chart {
     width: 600px;
-    height: 400px;
+    height: 600px;
 }
 
 </style>
