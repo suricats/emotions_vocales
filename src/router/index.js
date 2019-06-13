@@ -5,6 +5,7 @@ import MainPage from '@/components/MainPage'
 import Record from '@/components/RecordAudio'
 import Library from '@/components/LoadAudio'
 import Import from '@/components/ImportAudio'
+import WelcomePage from '@/components/WelcomePage'
 
 
 Vue.use(Router)
@@ -12,24 +13,14 @@ Vue.use(Router)
 export default new Router({
     routes: [
       {
-        path: '/',
+        path: '/main',
         name: 'MainPage',
         component: MainPage
       },
       {
-        path: '/record',
-        name: 'RecordAudio',
-        component: Record
-      },
-      {
-        path: '/library',
-        name: 'LoadAudio',
-        component: Library
-      },
-      {
-        path: '/import',
-        name: 'ImportAudio',
-        component: Import
+        path: '/',
+        name: 'WelcomePage',
+        component: WelcomePage
       },
       {
         path: '*',

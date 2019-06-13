@@ -5,41 +5,60 @@
         <h3 class="main-subtitle"> Par CATS </h3>
         <div class="main-divider">
             <div class="router-link">
-                <img class="logo" :src="'radio.png'"/>
-                <router-link to="/library">Choisissez parmis nos exemples de fichiers audio</router-link>
-                <p class="main-paraph">
-                    Au contraire vous n'avez pas d'inspriration ou vous doutez de vos talents d'acteur  ? Ne vous inquètez pas Nous avons sélectionné différents extraits pour que vous puissiez tester la reconnaissance d'émotions vocales.
-                </p>
+                <img class="logo" :src="'radio.png'" v-on:click="createInstance('load')"/>
             </div>
             <div class="router-link">
-                <img class="logo" :src="'folder.png'"/>
-                <router-link to="/import">Téléchargez vos fichiers audio</router-link>
-                <p class="main-paraph">
-                    Vous avez une idée derrère la tête ? Vous pouvez utiliser les fichiers audio de votre choix pour tenter l'experience et annalyser les émotions tout au long de l'extrait.
-                </p>
+                <img class="logo" :src="'folder.png'" v-on:click="createInstance('import')"/>
             </div>
             <div class="router-link">
-                <img class="logo" :src="'micro.png'"/>
-                <router-link to="/record">Enregistrez vous et testez vos émotions</router-link>
-                <p class="main-paraph">
-                    Envie de tester vos talents d'acteur ? Enregistrez vous et constatez en direct  l'évolution de vos émotions !
-                </p>
+                <img class="logo" :src="'micro.png'" v-on:click="createInstance('record')"/>
             </div>
-
+        </div>
+        <div class="result-container" ref="container">
         </div>
     </div>
 </template>
 
 
 <script>
+import AnalyseInstance from '@/components/AnalyseInstance.vue'
+import Vue from 'vue'
 export default {
+    props: ['type'],
     data: function () {
         return {
-            
+            instanceList: []
         }
     },
+    components: {
+        AnalyseInstance
+    },
+    mounted() {
+        this.createInstance(this.$route.query.type)
+    },
     methods: {
+        createInstance(typeRequested) {
+            console.log(typeRequested)
 
+            console.log("instanciate card AnalyseVue")
+            var ComponentClass = Vue.extend(AnalyseInstance)
+            var instance = new ComponentClass({
+                propsData: { type: typeRequested, idx: this.instanceList.length, delete: this.deleteInstance}
+            })
+            instance.$mount() // pass nothing
+            this.$refs.container.appendChild(instance.$el)
+
+            var instanceObject = {}
+            instanceObject.idx = this.instanceList.length
+            instanceObject.instance = instance
+            this.instanceList.push(instanceObject)
+        },
+        deleteInstance(idx) {
+            console.log("delete " + idx)
+            this.instanceList[idx].instance.$destroy()
+            this.$refs.container.removeChild(this.instanceList[idx].instance.$el);
+            this.instanceList.splice(idx, 1)
+        }
     }
 }
 </script>
@@ -64,7 +83,7 @@ export default {
     margin-top: 50px;
     display: flex;
     justify-content: center;
-    align-content: flex-start;
+    align-content: center;
 }
 
 a {
@@ -80,6 +99,8 @@ a {
     font-size: 20px;
     color: #008991;
     display: flex;
+    align-items: center;
+    text-align: center;
     flex-direction: column;
   }
 
@@ -92,5 +113,13 @@ a {
 .logo {
     width: 128px;
     height: 128px;
+}
+
+.result-container {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
 }
 </style>
