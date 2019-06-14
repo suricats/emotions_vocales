@@ -4,17 +4,24 @@
             <p> {{this.type}} </p>
             <img class="img-delete" v-on:click="onDelete" :src="'x-button.png'">
         </div>
-        <p> {{this.type}} {{this.idx}}</p>
+        <div v-if="type === 'record'">
+            <record-audio/>
+        </div>
     </div>
 </template>
 
 <script>
+import RecordAudio from '@/components/RecordAudio.vue'
+
 export default {
     name: 'AnalyseInstance',
     props: ['type', 'idx', 'delete'],
     data: function () {
         return {
         }
+    },
+    components: {
+        RecordAudio
     },
     methods: {
         onDelete (event) {

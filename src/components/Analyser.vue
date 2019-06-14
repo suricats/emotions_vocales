@@ -1,14 +1,11 @@
 
 <template>
     <div class="sparkline-container">
-        <div class="chart">
-            <canvas id="lineChart" width="100" height="100"></canvas>
+        <div class="line-chart">
+            <canvas id="lineChart" width="400" height="200"></canvas>
         </div>
-        <div class="chart">
-            <canvas id="radarChart" width="100" height="100"></canvas>
-        </div>
-        <div class="chart">
-            <canvas id="doughnutChart" width="100" height="100"></canvas>
+        <div class="doughnut-chart">
+            <canvas id="doughnutChart" width="200" height="200"></canvas>
         </div>
     </div>
 </template>
@@ -44,7 +41,7 @@ export default {
             var label = []
             var idx = 0;
             while (idx < this.calm.length) {
-                label.push((idx * 5).toString())
+                label.push((idx * 3).toString())
                 idx = idx + 1;
             }
             var ctx = document.getElementById('lineChart');
@@ -96,7 +93,6 @@ export default {
                     }
                 ]}
             });
-            var ctxRadar = document.getElementById('radarChart');
 
             var total = 0;
             for(var i = 0; i < this.calm.length; i++) {
@@ -124,33 +120,12 @@ export default {
             }
             var averageSorrow = total / this.sorrow.length;
 
-            console.log("Sorrow " + averageSorrow)
-
-            var myRadarChart = new Chart(ctxRadar, {
-                type: 'radar',
-                data: {
-                    labels: ['Calme', 'Colère', 'Joie', 'Tristesse'],
-                    datasets:
-                     [{
-                        label: 'Moyenne',
-                        data: [averageCalm, averageAnger, averageJoy, averageSorrow],
-                        backgroundColor: [
-                            'rgba(0, 100, 62, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(0, 100, 62, 1)'
-                        ]
-                     }]
-                }
-            });
-
 
             var ctxDoughnut = document.getElementById('doughnutChart');
 
             new Chart(ctxDoughnut, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Calme', 'Colère', 'Joie', 'Tristesse'],
                     datasets:
                      [{
                         label: 'Moyenne',
@@ -178,18 +153,23 @@ export default {
 <style>
 
 .sparkline-container {
-    width: 70%;
+    width: 700px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
     align-content: center;
     align-items: center;
 
 }
 
-.chart {
-    width: 600px;
-    height: 600px;
+.line-chart {
+    width: 400px;
+    height: 200px;
+}
+
+.doughnut-chart {
+    width: 200px;
+    height: 200px;
 }
 
 </style>

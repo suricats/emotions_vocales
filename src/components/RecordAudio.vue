@@ -1,28 +1,18 @@
 <template>
     <div>
-        <h1 class="record-title">
-            Mes Emotions
-        </h1>
-        <div class="title-container">
-            <h3 class="title-secondary"> Ici vous pouvez vous enregistrer et écouter votre enregistrement. Lorsque vous êtes prêts,
-                soumetez le et observez l'évolution de vos émotions ! </h3>
-        </div>
         <div class="record-container">
             <div class="btn-record">
                 <img class="img-record" v-bind:class="{ 'recording': isRecording }" :src="'microphone.png'" v-on:click="OnClickRecord">
             </div>
-            <div id="audio" class="player-wrapper">
-                <audio-player ref="player"></audio-player>
+            <div class="result-container">
+                <div>
+                    <analyser ref="analyser"></analyser>
+                </div>
+                <div id="audio" class="player-wrapper">
+                    <audio-player ref="player"></audio-player>
+                </div>
             </div>
-        </div>
-        <div class="submit-container" v-if="audioUrl">
-            <button class="buton-validate" v-on:click="SimulateEmotions">
-                Annalyser
-            </button>
-        </div>
-        <div class="score-container">
-            <analyser ref="analyser"></analyser>
-        </div>
+        </div>   
     </div>
 </template>
 
@@ -35,14 +25,13 @@ import wav from '@/plugins/wav.js'
 export default {
     data: function () {
         return {
-            audioFile: Object,
-            audioUrl: "",
-            audio: Object,
             isRecording: false,
             recordingData: [],
-            mediaRecorder: null,
+            intervalId: null,
+            recorder: null,
+            blobs: [],
             start: null,
-            duration: 0
+            recordedChunks: []
         }
     },
     components: {
@@ -50,52 +39,71 @@ export default {
         Analyser
     },
     methods: {
+        StartRecording(that, stream) {
+            var chunk = [];
+            const mime = ['audio/wav'] 
+                .filter(MediaRecorder.isTypeSupported)[0];
+            var options = {
+                mimeType : mime
+            }
+            console.log(stream)
+            var recorder = new MediaRecorder(stream);
+            recorder.ondataavailable = function(event) {
+                chunk.push(event.data)
+                that.recordedChunks.push(event.data)
+            }
+            recorder.onstop = function(event) {
+            const blob = new Blob(chunk, options);
+            console.log(blob)
+            that.blobs.push(blob)
+            var audioUrl = URL.createObjectURL(blob);
+            console.log(audioUrl)
+            const resampler = require('audio-resampler');
+            resampler(audioUrl, 11025, function(event){
+                event.getFile(function(fileEvent){
+                    that.SimulateEmotions(fileEvent)
+                });
+            });
+            }
+            setTimeout(()=> recorder.stop(), 3000); // we'll have a 3s media file
+            recorder.start();
+            that.isRecording = true;
+        },
+        StopRecording() {
+            this.isRecording = false;
+            //this.recorder.stop()
+            clearInterval(this.intervalId);
+            this.duration = Math.floor((Date.now() - this.start) / 1000); // Duration in seconds
+            console.log("concat audio")
+            var blob = new Blob(this.recordedChunks)
+            var audioUrl = URL.createObjectURL(blob);
+            console.log("final blob : " + audioUrl)
+
+            const resampler = require('audio-resampler');
+            var that = this;
+            resampler(audioUrl, 11025, function(event){
+                event.getFile(function(fileEvent){
+                    that.audioUrl = fileEvent;
+                    that.audio = new Audio(that.audioUrl);
+                    that.audioRecorded(that.audio)
+                });
+            });
+        },
         OnClickRecord() {
-            this.recordingData = [];
-            /* eslint-disable no-console */
-            if (!this.isRecording) {
-                const that = this;
+            if (this.isRecording === true) {
+                this.StopRecording();
+            } else {
+                this.start = Date.now()
+                this.recordingData = [];
+                var that = this;
                 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
                 navigator.getUserMedia({
-                    audio: { channelCount: 1, sampleRate: 11025, sampleSize: 16}
+                        audio: { channelCount: 1, sampleRate: 11025, sampleSize: 16}
                     },function(stream) {
-                        const mime = ['audio/wav'] 
-                            .filter(MediaRecorder.isTypeSupported)[0];
-                        var options = {
-                            mimeType : mime
-                        }    
-                        that.mediaRecorder = new MediaRecorder(stream, options);
-                        that.start = Date.now();
-                        console.log("start recording : " + that.start)
-                        that.mediaRecorder.start();
-                        that.isRecording = true
-                        that.mediaRecorder.ondataavailable = function(event) {
-                            that.recordingData.push(event.data);
-                        }
-                        that.mediaRecorder.onstop = function(event) {
-                            that.isRecording = false;
-                            that.duration = Math.floor((Date.now() - that.start) / 1000); // Duration in seconds
-                            console.log("duration : " + that.duration)
-                            const blob = new Blob(that.recordingData, {'type' : 'audio/wav'});
-
-                            console.log(blob)
-                            that.audioUrl = URL.createObjectURL(blob);
-                            // This will modify the sample rate 
-                            const resampler = require('audio-resampler');
-                            resampler(that.audioUrl, 11025, function(event){
-                                event.getFile(function(fileEvent){
-                                    that.audioUrl = fileEvent;
-                                    that.audio = new Audio(that.audioUrl);
-                                    that.audioRecorded(that.audio)
-                                });
-                            });
-                        }
+                        that.intervalId = setInterval( function() { that.StartRecording(that, stream); }, 3000);
                     },function(error) {
                         alert("Vous devez autoriser l'application à accèder à votre microphone " + error);
-                    });
-            } else {
-                this.isRecording = false;
-                this.mediaRecorder.stop();
+                    })
             }
         },
         blobToFile(theBlob, fileName){
@@ -127,40 +135,21 @@ export default {
                 console.log(e) // Maybe in the futur it will be an alert
             }
         },
-        sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        },
-        async SliceWav(wavFile) {
-            var sStart = 0;
-            var sRead = 0;
-            var duration = this.duration
+        async SimulateEmotions (url) {
             
-            while (sStart < duration) {
-                    
-                    if (sStart + 5 > duration) {
-                        sRead = duration - sStart;
-                    } else {
-                        sRead = 5;
-                    }
+            let blob = await fetch(url).then(r => r.blob());
 
-                    if (sRead === 0) {break;}
+            var formData = new FormData();
 
-                    await wavFile.slice(sStart, sRead, this.success);
-                    await this.sleep(5000)
-                    sStart = sStart + sRead
+            formData.append("wav", this.blobToFile(blob, "audio"));
+            formData.append("apikey", process.env.VUE_APP_API_KEY);
+
+            try {
+                const response = await this.$http.post('',formData)
+                this.initialize(response.data)
+            } catch (e) {
+                console.log(e) // Maybe in the futur it will be an alert
             }
-        },
-        async SimulateEmotions () {
-            
-            let blob = await fetch(this.audioUrl).then(r => r.blob());
-
-            var wavFile = new wav(blob);
-            this.audio.play()
-            var that = this
-            wavFile.onloadend = function () {
-                that.SliceWav(this)
-            };
-            
         }
     }
 }
@@ -198,11 +187,12 @@ body {
     display: flex;
     align-items: column;
     justify-content: center;
+    height: 300px;
 }
 
 .btn-record {
     margin-top: 30px;
-    height: 100%;
+    height: 70%;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -248,6 +238,12 @@ body {
     margin-top: 50px;
     display: flex;
     align-items: center;
+    justify-content: center;
+}
+
+.result-container {
+    display: flex;
+    align-items: row;
     justify-content: center;
 }
 </style>
