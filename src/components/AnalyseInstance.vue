@@ -4,14 +4,14 @@
             <p> {{this.type}} </p>
             <img class="img-delete" v-on:click="onDelete" :src="'x-button.png'">
         </div>
-        <div v-if="type === 'record'">
-            <record-audio/>
+        <div ref="container" class="container">
         </div>
     </div>
 </template>
 
 <script>
 import RecordAudio from '@/components/RecordAudio.vue'
+import Vue from 'vue'
 
 export default {
     name: 'AnalyseInstance',
@@ -23,10 +23,20 @@ export default {
     components: {
         RecordAudio
     },
+    mounted() {
+        this.createAnalyser()
+    },
     methods: {
         onDelete (event) {
             this.delete(this.idx)
+        },
+        createAnalyser() {
+            var ComponentClass = Vue.extend(RecordAudio)
+            var instance = new ComponentClass({})
+            instance.$mount() // pass nothing
+            this.$refs.container.appendChild(instance.$el)
         }
+
     },
 }
 </script>

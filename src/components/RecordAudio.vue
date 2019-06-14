@@ -5,8 +5,8 @@
                 <img class="img-record" v-bind:class="{ 'recording': isRecording }" :src="'microphone.png'" v-on:click="OnClickRecord">
             </div>
             <div class="result-container">
-                <div>
-                    <analyser ref="analyser"></analyser>
+                <div class="analyse-container" ref="container">
+                    <component :is="Analyser" ref="analyser"></component>    
                 </div>
                 <div id="audio" class="player-wrapper">
                     <audio-player ref="player"></audio-player>
@@ -21,6 +21,7 @@
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import Analyser from '@/components/Analyser.vue'
 import wav from '@/plugins/wav.js'
+import Vue from 'vue'
 
 export default {
     data: function () {
@@ -72,6 +73,8 @@ export default {
         StopRecording() {
             this.isRecording = false;
             //this.recorder.stop()
+
+        
             clearInterval(this.intervalId);
             this.duration = Math.floor((Date.now() - this.start) / 1000); // Duration in seconds
             console.log("concat audio")
@@ -98,12 +101,12 @@ export default {
                 var that = this;
                 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
                 navigator.getUserMedia({
-                        audio: { channelCount: 1, sampleRate: 11025, sampleSize: 16}
-                    },function(stream) {
-                        that.intervalId = setInterval( function() { that.StartRecording(that, stream); }, 3000);
-                    },function(error) {
-                        alert("Vous devez autoriser l'application à accèder à votre microphone " + error);
-                    })
+                    audio: { channelCount: 1, sampleRate: 11025, sampleSize: 16}
+                },function(stream) {
+                    that.intervalId = setInterval( function() { that.StartRecording(that, stream); }, 3000);
+                },function(error) {
+                    alert("Vous devez autoriser l'application à accèder à votre microphone " + error);
+                })
             }
         },
         blobToFile(theBlob, fileName){
@@ -115,6 +118,7 @@ export default {
             this.$refs.player.audioRecorded(audio)
         },
         initialize(data) {
+            console.log(this.analyser)
             this.$refs.analyser.initialize(data)
         },
         async success(wavFile) {
