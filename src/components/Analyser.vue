@@ -1,11 +1,10 @@
 
 <template>
     <div class="sparkline-container">
-        <div class="line-chart">
-            <canvas id="lineChart" width="400" height="200"></canvas>
+        <p> {{idx}} </p>
+        <div class="line-chart" ref="linecontainer">
         </div>
-        <div class="doughnut-chart">
-            <canvas id="doughnutChart" width="200" height="200"></canvas>
+        <div class="doughnut-chart" ref="doughnutcontainer">
         </div>
     </div>
 </template>
@@ -14,6 +13,7 @@
 <script>
 import Chart from 'chart.js';
 export default {
+    props: ['idx'],
     data: function () {
         return {
             calm : [0],
@@ -23,6 +23,9 @@ export default {
             energy : [0]
         }
     },
+    mounted() {
+        this.createCanvas()
+    },
     methods: {
         clean() {
             this.calm = [0],
@@ -31,7 +34,26 @@ export default {
             this.sorrow = [0],
             this.energy = [0]
         },
+        createCanvas() {
+            var canvas = document.createElement("canvas");
+            canvas.width = '400';
+            canvas.height = '200';
+            canvas.id = 'lineChart'+ this.idx
+            this.$refs.linecontainer.appendChild(canvas);
+            console.log('chart created')
+
+            var canvasDoughnut = document.createElement("canvas");
+            canvasDoughnut.width = '200';
+            canvasDoughnut.height = '200';
+            canvasDoughnut.id = 'doughnutChart'+this.idx
+            this.$refs.doughnutcontainer.appendChild(canvasDoughnut);
+            console.log('chart created')
+
+        },
         initialize(jsonResult) {
+
+            console.log('updating data with idx ' + this.idx + ' : ' + jsonResult)
+
             this.calm.push(jsonResult.calm * 2);
             this.anger.push(jsonResult.anger * 2);
             this.joy.push(jsonResult.joy * 2);
@@ -44,8 +66,10 @@ export default {
                 label.push((idx * 3).toString())
                 idx = idx + 1;
             }
-            var ctx = document.getElementById('lineChart');
-            var datas = 
+            var ctx = document.getElementById('lineChart'+this.idx);
+
+            console.log(ctx)
+
             new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -120,8 +144,7 @@ export default {
             }
             var averageSorrow = total / this.sorrow.length;
 
-
-            var ctxDoughnut = document.getElementById('doughnutChart');
+            var ctxDoughnut = document.getElementById('doughnutChart'+this.idx);
 
             new Chart(ctxDoughnut, {
                 type: 'doughnut',

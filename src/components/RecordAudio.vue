@@ -1,12 +1,12 @@
 <template>
     <div>
         <div class="record-container">
+            <p> {{idx}} </p> 
             <div class="btn-record">
                 <img class="img-record" v-bind:class="{ 'recording': isRecording }" :src="'microphone.png'" v-on:click="OnClickRecord">
             </div>
             <div class="result-container">
-                <div class="analyse-container" ref="container">
-                    <component :is="Analyser" ref="analyser"></component>    
+                <div class="analyse-container" id="analyser-container" ref="container">
                 </div>
                 <div id="audio" class="player-wrapper">
                     <audio-player ref="player"></audio-player>
@@ -24,6 +24,7 @@ import wav from '@/plugins/wav.js'
 import Vue from 'vue'
 
 export default {
+    props: ['idx'],
     data: function () {
         return {
             isRecording: false,
@@ -32,7 +33,8 @@ export default {
             recorder: null,
             blobs: [],
             start: null,
-            recordedChunks: []
+            recordedChunks: [],
+            analyser: null
         }
     },
     components: {
@@ -98,6 +100,14 @@ export default {
             } else {
                 this.start = Date.now()
                 this.recordingData = [];
+
+                var ComponentClass = Vue.extend(Analyser)
+                this.analyser = new ComponentClass({propsData: { idx: this.idx}})
+                this.analyser.$mount() // pass nothing
+                this.$refs.container.appendChild(this.analyser.$el)
+
+                console.log(this.analyser)
+
                 var that = this;
                 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
                 navigator.getUserMedia({
@@ -118,26 +128,8 @@ export default {
             this.$refs.player.audioRecorded(audio)
         },
         initialize(data) {
-            console.log(this.analyser)
-            this.$refs.analyser.initialize(data)
-        },
-        async success(wavFile) {
-            var blob = new Blob([wavFile], {type: 'audio/wav'});
-
-            console.log(URL.createObjectURL(blob))
-
-
-            var formData = new FormData();
-
-            formData.append("wav", this.blobToFile(blob, "audio"));
-            formData.append("apikey", process.env.VUE_APP_API_KEY);
-
-            try {
-                const response = await this.$http.post('',formData)
-                this.initialize(response.data)
-            } catch (e) {
-                console.log(e) // Maybe in the futur it will be an alert
-            }
+            console.log('in record updating value with idx ' + this.idx)
+            this.analyser.initialize(data)
         },
         async SimulateEmotions (url) {
             

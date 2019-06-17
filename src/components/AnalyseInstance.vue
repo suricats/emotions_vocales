@@ -1,7 +1,6 @@
 <template>
     <div class="card">
         <div class="first-row">
-            <p> {{this.type}} </p>
             <img class="img-delete" v-on:click="onDelete" :src="'x-button.png'">
         </div>
         <div ref="container" class="container">
@@ -10,8 +9,8 @@
 </template>
 
 <script>
-import RecordAudio from '@/components/RecordAudio.vue'
 import Vue from 'vue'
+import RecordAudio from '@/components/RecordAudio.vue'
 
 export default {
     name: 'AnalyseInstance',
@@ -24,20 +23,23 @@ export default {
         RecordAudio
     },
     mounted() {
-        this.createAnalyser()
+       this.createAnalyser()
     },
     methods: {
         onDelete (event) {
             this.delete(this.idx)
         },
         createAnalyser() {
-            var ComponentClass = Vue.extend(RecordAudio)
-            var instance = new ComponentClass({})
-            instance.$mount() // pass nothing
-            this.$refs.container.appendChild(instance.$el)
+            console.log('analyse instance number ' + this.idx)
+            if (this.type === 'record') {
+                var ComponentClass = Vue.extend(RecordAudio)
+                var instance = new ComponentClass({propsData: { idx: this.idx}})
+                instance.$mount() // pass nothing
+                this.$refs.container.appendChild(instance.$el)
+            }
         }
 
-    },
+    }
 }
 </script>
 
