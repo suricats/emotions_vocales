@@ -42,7 +42,6 @@ export default {
         },
         playAudio() {
             this.audioObject.play()
-            console.log(this.audioObject)
         },
         pauseAudio() {
             this.audioObject.pause()

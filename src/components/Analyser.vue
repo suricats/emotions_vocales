@@ -48,7 +48,6 @@ export default {
 
         },
         initialize(jsonResult) {
-            console.log("initialize " + this.idx)
             
             this.calm.push(jsonResult.calm * 2);
             this.anger.push(jsonResult.anger * 2);

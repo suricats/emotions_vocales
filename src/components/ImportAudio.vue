@@ -1,8 +1,10 @@
 <template>
     <div>
         <div class="import-audio-container">
-            <input id="loadFile" type="file"
+            <div class="import-container">
+                <input id="loadFile" type="file"
                 v-on:change="verifyFile"/>
+            </div>
             <div class="result-container">
                 <div class="analyse-container" id="analyser-container" ref="container">
                     <analyser ref="analyser"/>
@@ -39,8 +41,6 @@ export default {
         verifyFile() {
             const audioInput = document.getElementById("loadFile");;
 
-            console.log(audioInput)
-
             if (audioInput.value != '' && audioInput.value != undefined && audioInput.files) {
                 var fReader = new FileReader();
                 fReader.readAsDataURL(audioInput.files[0]);
@@ -48,7 +48,6 @@ export default {
                 fReader.onloadend = function(event){
                     that.audioUrl = event.target.result;
                     that.audio = new Audio(that.audioUrl);
-                    console.log(audio)
                     that.$refs.player.audioRecorded(that.audio)
                     that.clean()
                     that.SimulateEmotions()
@@ -94,9 +93,6 @@ export default {
         async success(wavFile) {
             var blob = new Blob([wavFile], {type: 'audio/wav'});
 
-            console.log(URL.createObjectURL(blob))
-
-
             var formData = new FormData();
 
             formData.append("wav", this.blobToFile(blob, "audio"));
@@ -118,14 +114,11 @@ export default {
             var sRead = 0;
             var duration;
             
-            console.log(this.audio)
-
             if (this.audio.duration === null || this.audio.duration === undefined || this.audio.duration > 30) {
                 duration = 5
             } else {
                 duration = this.audio.duration;
             }
-            console.log("duration : " + duration)
 
             while (sStart < duration) {     
                 if (sStart + 5 > duration) {
@@ -138,7 +131,7 @@ export default {
 
                 await wavFile.slice(sStart, sRead, this.success);
                 await this.sleep(5000)
-                console.log("start : " + sStart + " SRead : " + sRead)
+                
                 sStart = sStart + sRead
             }
         },
@@ -168,6 +161,9 @@ body {
   height: 100%;
 }
 
+.import-container {
+    width: 20%;
+}
 
 .import-audio-container {
     display: flex;
@@ -210,6 +206,7 @@ body {
 }
 
 .result-container {
+    width: 80%;
     display: flex;
     align-items: row;
     justify-content: center;

@@ -2,9 +2,13 @@
     <div class="card">
         <div class="first-row">
             <h3 class="card-title"> {{type}} {{idx}} </h3>
-            <img class="img-delete" v-on:click="onDelete" :src="'x-button.png'">
+            <div>
+                <img class="img-delete" v-on:click="onDelete" :src="'x-button.png'">
+                <img v-if="isShowed" class="img-open" v-on:click="isShowed = false" :src="'down-button.png'">
+                <img v-if="!isShowed" class="img-open" v-on:click="isShowed = true" :src="'up-button.png'">
+            </div>
         </div>
-        <div ref="container" class="container">
+        <div ref="container" class="container" v-show="isShowed">
         </div>
     </div>
 </template>
@@ -20,6 +24,7 @@ export default {
     props: ['type', 'idx', 'delete'],
     data: function () {
         return {
+            isShowed: true
         }
     },
     components: {
@@ -78,9 +83,16 @@ export default {
 }
 
 .card-title {
+    margin-top: 10px;
     color: #008991;
     margin-left: 20px;
 }
 
+.img-open {
+    margin-top: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+    height: 32px;
+}
 
 </style>

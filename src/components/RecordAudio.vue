@@ -46,22 +46,20 @@ export default {
             var options = {
                 mimeType : mime
             }
-            console.log(stream)
             var recorder = new MediaRecorder(stream);
             recorder.ondataavailable = function(event) {
                 chunk.push(event.data)
                 that.recordedChunks.push(event.data)
             }
+
             recorder.onstop = function(event) {
             const blob = new Blob(chunk, options);
-            console.log(blob)
             that.blobs.push(blob)
             var audioUrl = URL.createObjectURL(blob);
-            console.log(audioUrl)
+
             const resampler = require('audio-resampler');
             resampler(audioUrl, 11025, function(event){
                 event.getFile(function(fileEvent){
-                    console.log("file event " + fileEvent)
                     that.SimulateEmotions(fileEvent)
                 });
             });
@@ -77,10 +75,8 @@ export default {
         
             clearInterval(this.intervalId);
             this.duration = Math.floor((Date.now() - this.start) / 1000); // Duration in seconds
-            console.log("concat audio")
             var blob = new Blob(this.recordedChunks)
             var audioUrl = URL.createObjectURL(blob);
-            console.log("final blob : " + audioUrl)
 
             const resampler = require('audio-resampler');
             var that = this;
@@ -104,7 +100,6 @@ export default {
                 this.analyser.$mount() // pass nothing
                 this.$refs.container.appendChild(this.analyser.$el)
 
-                console.log(this.analyser)
 
                 var that = this;
                 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
@@ -127,7 +122,6 @@ export default {
             this.$refs.player.audioRecorded(audio)
         },
         initialize(data) {
-            console.log('in record updating value with idx ' + this.idx)
             this.analyser.initialize(data)
         },
         async SimulateEmotions (url) {
@@ -167,8 +161,8 @@ body {
 
 .btn-record {
     margin-top: 30px;
-    height: 70%;
     border-radius: 50%;
+    width: 20%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -196,6 +190,7 @@ body {
 
 
 .result-container {
+    width: 80%;
     display: flex;
     align-items: row;
     justify-content: center;
