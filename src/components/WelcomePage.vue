@@ -6,21 +6,21 @@
         <div class="main-divider">
             <div class="router-link">
                 <img class="logo" :src="'radio.png'"/>
-                <router-link :to="{ path: 'main', query: { type: 'load' }}">Choisissez parmis nos exemples de fichiers audio</router-link>
+                <router-link :to="{ path: 'main', query: { type: 'Librairie' }}">Choisissez parmis nos exemples de fichiers audio</router-link>
                 <p class="main-paraph">
                     Au contraire vous n'avez pas d'inspriration ou vous doutez de vos talents d'acteur  ? Ne vous inquètez pas Nous avons sélectionné différents extraits pour que vous puissiez tester la reconnaissance d'émotions vocales.
                 </p>
             </div>
             <div class="router-link">
                 <img class="logo" :src="'folder.png'"/>
-                <router-link :to="{ path: 'main', query: { type: 'import' }}">Téléchargez vos fichiers audio</router-link>
+                <router-link :to="{ path: 'main', query: { type: 'Fichier Audio' }}">Téléchargez vos fichiers audio</router-link>
                 <p class="main-paraph">
                     Vous avez une idée derrère la tête ? Vous pouvez utiliser les fichiers audio de votre choix pour tenter l'experience et annalyser les émotions tout au long de l'extrait.
                 </p>
             </div>
             <div class="router-link">
                 <img class="logo" :src="'micro.png'"/>
-                <router-link :to="{ path: 'main', query: { type: 'record' }}">Enregistrez vous et testez vos émotions</router-link>
+                <router-link :to="{ path: 'main', query: { type: 'Enregistrement' }}">Enregistrez vous et testez vos émotions</router-link>
                 <p class="main-paraph">
                     Envie de tester vos talents d'acteur ? Enregistrez vous et constatez en direct  l'évolution de vos émotions !
                 </p>

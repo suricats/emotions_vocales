@@ -1,28 +1,12 @@
 <template>
     <div>
-        <h1 class="load-title">
-            Notre librairie
-        </h1>
-        <div class="title-container">
-            <h3 class="title-secondary"> Nous avons séléctionné pour vous un ensemble d'éxtraits pour vous permettre de tester facilement la reconnaissance d'émotions vocales ! </h3>
-        </div>
-        <div class="load-audio-container">
+    <audio-list v-show="showListMSodal" v-on:close="audioRecorded"/>
+        <div class="result-container">
+            <div class="analyse-container" id="analyser-container" ref="container">
+            </div>
             <div id="audio" class="player-wrapper">
                 <audio-player ref="player"></audio-player>
             </div>
-            <ul id="audio-list">
-                <li v-for="audio in audioList" v-on:click="audioRecorded(audio)" class="audio-item">
-                    {{ audio.innerText }}
-                </li>
-            </ul>
-        </div>
-        <div class="submit-container" v-if="audioUrl">
-            <button class="buton-validate" v-on:click="SimulateEmotions">
-                Annalyser
-            </button>
-        </div>
-        <div class="score-container">
-            <analyser ref="analyser"></analyser>
         </div>
     </div>
 </template>
@@ -39,55 +23,43 @@ import joy2 from '../assets/audio/joy7.wav'
 import joy3 from '../assets/audio/joy8.wav'
 import discours from '../assets/audio/discours.wav'
 
-
+import AudioList from '@/components/AudioList.vue'
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import Analyser from '@/components/Analyser.vue'
 import wav from '@/plugins/wav.js'
+import Vue from 'vue'
 
 export default {
+    props: ['idx'],
     data: function () {
         return {
+            showListMSodal: true,
             audioFile: Object,
             audioUrl: "",
             audio: Object,
-            audioList: []
+            audioList: [],
+            analyser: null
         }
-    },
-    created: function() {
-        this.getAudios();
     },
     components: {
         AudioPlayer,
+        AudioList,
         Analyser
     },
     methods: {
-        getAudios() {
-            this.audioList.push(new Audio(anger1));
-            this.audioList[this.audioList.length - 1].innerText = "angry woman";
-            this.audioList.push(new Audio(anger2));
-            this.audioList[this.audioList.length - 1].innerText = "really angry woman";
-            this.audioList.push(new Audio(anger3));
-            this.audioList[this.audioList.length - 1].innerText = "over angry woman";
-
-            this.audioList.push(new Audio(sad1));
-            this.audioList[this.audioList.length - 1].innerText = "sad woman";
-            this.audioList.push(new Audio(sad2));
-            this.audioList[this.audioList.length - 1].innerText = "sad man";
-
-
-            this.audioList.push(new Audio(joy1));
-            this.audioList[this.audioList.length - 1].innerText = "happy man";
-            this.audioList.push(new Audio(joy2));
-            this.audioList[this.audioList.length - 1].innerText = "happy woman";
-            this.audioList.push(new Audio(joy3));
-            this.audioList[this.audioList.length - 1].innerText = "really happy man";
-
-            this.audioList.push(new Audio(discours));
-            this.audioList[this.audioList.length - 1].innerText = "discours de l'abée Pierre";
-        },
         audioRecorded(audio) {
+            console.log(audio)
+            this.showListMSodal = false
+
+            var ComponentClass = Vue.extend(Analyser)
+            this.analyser = new ComponentClass({propsData: { idx: this.idx}})
+            this.analyser.$mount() // pass nothing
+            this.$refs.container.appendChild(this.analyser.$el)
+
+
             this.audioUrl = audio.src
             this.audio = new Audio(this.audioUrl);
+            this.SimulateEmotions()
             this.$refs.player.audioRecorded(this.audio)
             this.clean()
         },
@@ -117,10 +89,10 @@ export default {
             return new Blob([ia], {type: 'audio/wav'});
         },
         initialize(data) {
-            this.$refs.analyser.initialize(data)
+            this.analyser.initialize(data)
         },
         clean() {
-            this.$refs.analyser.clean()
+            this.analyser.clean()
         },
         async success(wavFile) {
             var blob = new Blob([wavFile], {type: 'audio/wav'});
@@ -183,7 +155,7 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
 
 html,
 body {

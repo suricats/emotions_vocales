@@ -1,29 +1,19 @@
 <template>
     <div>
-        <h1 class="import-title">
-            Mon audio
-        </h1>
-        <div class="title-container">
-            <h3 class="title-secondary"> Un extrait de film ? Une discussion avec votre patron ? Importez le fichier audio de votre choix et annalyser le afin d'en connaitre les émotions vocales ! </h3>
-        </div>
-        <div class="load-audio-container">
-            <div id="audio" class="player-wrapper">
-                <audio-player ref="player"></audio-player>
-            </div>
+        <div class="import-audio-container">
             <input id="loadFile" type="file"
                 v-on:change="verifyFile"/>
-        </div>
-        <div class="submit-container" >
-            <button class="buton-validate" v-on:click="SimulateEmotions">
-                Annalyser
-            </button>
-        </div>
-        <div class="score-container">
-            <analyser ref="analyser"></analyser>
+            <div class="result-container">
+                <div class="analyse-container" id="analyser-container" ref="container">
+                    <analyser ref="analyser"/>
+                </div>
+                <div id="audio" class="player-wrapper">
+                    <audio-player ref="player"></audio-player>
+                </div>
+            </div>
         </div>
     </div>
 </template>
-
 
 <script>
 
@@ -61,6 +51,7 @@ export default {
                     console.log(audio)
                     that.$refs.player.audioRecorded(that.audio)
                     that.clean()
+                    that.SimulateEmotions()
                 }
                 
             }
@@ -170,54 +161,19 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
 
 html,
 body {
   height: 100%;
 }
 
-.title-container {
-    text-align: center;
+
+.import-audio-container {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.import-title {
-    font-size: 30px;
-    margin-top: 30px;
-    text-align: center;
-    color: #008991
-}
-
-.title-secondary {
-    text-align: left;
-    margin-top: 50px;
-    width : 70%;
-    color: #535353;
-}
-
-
-.submit-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.buton-validate {
-    margin-top: 30px;
-    height: 30px;
-    width: 120px; 
-    background-color: #de1300;
-    color: #ffffff;
-    border-radius: 10%;
-}
-
-.load-audio-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    height: 300px;
 }
 
 #audio-list {
@@ -233,7 +189,7 @@ body {
     font-size: 15px;
 }
 .player-wrapper {
-    margin-right: 20px;
+    margin-left: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -243,6 +199,19 @@ body {
     margin-top: 50px;
     display: flex;
     align-items: center;
+    justify-content: center;
+}
+
+.analyse-container {
+    margin-left: 30px;
+    width: 700px;
+    height: 250px;
+    background-color: #ededed;
+}
+
+.result-container {
+    display: flex;
+    align-items: row;
     justify-content: center;
 }
 </style>

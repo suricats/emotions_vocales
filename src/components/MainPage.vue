@@ -5,13 +5,13 @@
         <h3 class="main-subtitle"> Par CATS </h3>
         <div class="main-divider">
             <div class="router-link">
-                <img class="logo" :src="'radio.png'" v-on:click="createInstance('load')"/>
+                <img class="logo" :src="'radio.png'" v-on:click="createInstance('Librairie')"/>
             </div>
             <div class="router-link">
-                <img class="logo" :src="'folder.png'" v-on:click="createInstance('import')"/>
+                <img class="logo" :src="'folder.png'" v-on:click="createInstance('Fichier Audio')"/>
             </div>
             <div class="router-link">
-                <img class="logo" :src="'micro.png'" v-on:click="createInstance('record')"/>
+                <img class="logo" :src="'micro.png'" v-on:click="createInstance('Enregistrement')"/>
             </div>
         </div>
         <div class="result-container" ref="container">
@@ -38,9 +38,7 @@ export default {
     },
     methods: {
         createInstance(typeRequested) {
-            console.log(typeRequested)
 
-            console.log("instanciate card AnalyseVue")
             var ComponentClass = Vue.extend(AnalyseInstance)
             var instance = new ComponentClass({
                 propsData: { type: typeRequested, idx: this.instanceList.length, delete: this.deleteInstance}
@@ -54,7 +52,6 @@ export default {
             this.instanceList.push(instanceObject)
         },
         deleteInstance(idx) {
-            console.log("delete " + idx)
             this.instanceList[idx].instance.$destroy()
             this.$refs.container.removeChild(this.instanceList[idx].instance.$el);
             this.instanceList.splice(idx, 1)

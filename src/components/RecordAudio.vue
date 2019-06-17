@@ -1,7 +1,6 @@
 <template>
     <div>
         <div class="record-container">
-            <p> {{idx}} </p> 
             <div class="btn-record">
                 <img class="img-record" v-bind:class="{ 'recording': isRecording }" :src="'microphone.png'" v-on:click="OnClickRecord">
             </div>
@@ -20,7 +19,6 @@
 <script>
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import Analyser from '@/components/Analyser.vue'
-import wav from '@/plugins/wav.js'
 import Vue from 'vue'
 
 export default {
@@ -38,8 +36,7 @@ export default {
         }
     },
     components: {
-        AudioPlayer,
-        Analyser
+        AudioPlayer
     },
     methods: {
         StartRecording(that, stream) {
@@ -64,11 +61,12 @@ export default {
             const resampler = require('audio-resampler');
             resampler(audioUrl, 11025, function(event){
                 event.getFile(function(fileEvent){
+                    console.log("file event " + fileEvent)
                     that.SimulateEmotions(fileEvent)
                 });
             });
             }
-            setTimeout(()=> recorder.stop(), 3000); // we'll have a 3s media file
+            setTimeout(() => recorder.stop(), 3000); // we'll have a 3s media file
             recorder.start();
             that.isRecording = true;
         },
@@ -113,6 +111,7 @@ export default {
                 navigator.getUserMedia({
                     audio: { channelCount: 1, sampleRate: 11025, sampleSize: 16}
                 },function(stream) {
+                    that.StartRecording(that, stream)
                     that.intervalId = setInterval( function() { that.StartRecording(that, stream); }, 3000);
                 },function(error) {
                     alert("Vous devez autoriser l'application à accèder à votre microphone " + error);
@@ -151,33 +150,13 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 
 html,
 body {
   height: 100%;
 }
 
-.title-container {
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.record-title {
-    font-size: 30px;
-    margin-top: 30px;
-    text-align: center;
-    color: #008991
-}
-
-.title-secondary {
-    text-align: left;
-    margin-top: 50px;
-    width : 70%;
-    color: #535353;
-}
 
 .record-container {
     display: flex;
@@ -215,31 +194,17 @@ body {
     justify-content: center;
 }
 
-.submit-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.buton-validate {
-    margin-top: 30px;
-    height: 30px;
-    width: 120px; 
-    background-color: #de1300;
-    color: #ffffff;
-    border-radius: 10%;
-}
-
-.score-container {
-    margin-top: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 .result-container {
     display: flex;
     align-items: row;
     justify-content: center;
+}
+
+.analyse-container {
+    margin-left: 30px;
+    width: 700px;
+    height: 250px;
+    background-color: #ededed;
 }
 </style>

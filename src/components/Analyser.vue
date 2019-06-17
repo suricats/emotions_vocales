@@ -1,7 +1,6 @@
 
 <template>
     <div class="sparkline-container">
-        <p> {{idx}} </p>
         <div class="line-chart" ref="linecontainer">
         </div>
         <div class="doughnut-chart" ref="doughnutcontainer">
@@ -40,20 +39,17 @@ export default {
             canvas.height = '200';
             canvas.id = 'lineChart'+ this.idx
             this.$refs.linecontainer.appendChild(canvas);
-            console.log('chart created')
 
             var canvasDoughnut = document.createElement("canvas");
             canvasDoughnut.width = '200';
             canvasDoughnut.height = '200';
             canvasDoughnut.id = 'doughnutChart'+this.idx
             this.$refs.doughnutcontainer.appendChild(canvasDoughnut);
-            console.log('chart created')
 
         },
         initialize(jsonResult) {
-
-            console.log('updating data with idx ' + this.idx + ' : ' + jsonResult)
-
+            console.log("initialize " + this.idx)
+            
             this.calm.push(jsonResult.calm * 2);
             this.anger.push(jsonResult.anger * 2);
             this.joy.push(jsonResult.joy * 2);
@@ -68,7 +64,6 @@ export default {
             }
             var ctx = document.getElementById('lineChart'+this.idx);
 
-            console.log(ctx)
 
             new Chart(ctx, {
                 type: 'line',
@@ -129,8 +124,6 @@ export default {
                 total += this.anger[i];
             }
             var averageAnger = total / this.anger.length;
-
-            console.log(averageAnger)
 
             total = 0;
             for(var i = 0; i < this.joy.length; i++) {

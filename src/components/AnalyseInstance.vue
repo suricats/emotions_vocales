@@ -1,6 +1,7 @@
 <template>
     <div class="card">
         <div class="first-row">
+            <h3 class="card-title"> {{type}} {{idx}} </h3>
             <img class="img-delete" v-on:click="onDelete" :src="'x-button.png'">
         </div>
         <div ref="container" class="container">
@@ -11,6 +12,8 @@
 <script>
 import Vue from 'vue'
 import RecordAudio from '@/components/RecordAudio.vue'
+import ImportAudio from '@/components/ImportAudio.vue'
+import LoadAudio from '@/components/LoadAudio.vue'
 
 export default {
     name: 'AnalyseInstance',
@@ -20,7 +23,9 @@ export default {
         }
     },
     components: {
-        RecordAudio
+        RecordAudio,
+        ImportAudio,
+        LoadAudio
     },
     mounted() {
        this.createAnalyser()
@@ -30,13 +35,17 @@ export default {
             this.delete(this.idx)
         },
         createAnalyser() {
-            console.log('analyse instance number ' + this.idx)
-            if (this.type === 'record') {
-                var ComponentClass = Vue.extend(RecordAudio)
-                var instance = new ComponentClass({propsData: { idx: this.idx}})
-                instance.$mount() // pass nothing
-                this.$refs.container.appendChild(instance.$el)
+            var ComponentClass;
+            if (this.type === 'Enregistrement') {
+                ComponentClass = Vue.extend(RecordAudio)
+            } else if (this.type === 'Fichier Audio') {
+                ComponentClass = Vue.extend(ImportAudio)
+            } else {
+                ComponentClass = Vue.extend(LoadAudio)
             }
+            var instance = new ComponentClass({propsData: { idx: this.idx}})
+            instance.$mount() // pass nothing
+            this.$refs.container.appendChild(instance.$el)
         }
 
     }
@@ -67,5 +76,11 @@ export default {
     height: 28px;
     width: 28px;
 }
+
+.card-title {
+    color: #008991;
+    margin-left: 20px;
+}
+
 
 </style>
