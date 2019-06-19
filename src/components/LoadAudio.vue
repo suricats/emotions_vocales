@@ -37,6 +37,16 @@ export default {
         AudioList,
         Analyser
     },
+    created() {
+        window.eventBus.$on('add-card', value => {
+            this.idx += 1
+        }),
+        window.eventBus.$on('delete-card', value => {
+            if (value < this.idx) {
+                this.idx -= 1
+            }
+        })
+    },
     methods: {
         audioRecorded(audio) {
             this.showListMSodal = false

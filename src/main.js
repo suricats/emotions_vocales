@@ -10,6 +10,7 @@ Vue.config.productionTip = false
 Vue.use(axios)
 Vue.use(Vuetify)
 
+window.eventBus = new Vue({})
 
 new Vue({
   el: '#app',

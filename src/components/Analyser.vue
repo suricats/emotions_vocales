@@ -25,13 +25,34 @@ export default {
     mounted() {
         this.createCanvas()
     },
+    created() {
+        window.eventBus.$on('add-card', value => {
+            this.idx += 1
+        }),
+        window.eventBus.$on('delete-card', value => {
+            if (value < this.idx) {
+                this.idx -= 1
+            }
+        })
+    },
     methods: {
         clean() {
-            this.calm = [0],
-            this.anger = [0],
-            this.joy = [0],
-            this.sorrow = [0],
+            this.calm = [0]
+            this.anger = [0]
+            this.joy = [0]
+            this.sorrow = [0]
             this.energy = [0]
+
+            var line = document.getElementById('lineChart'+this.idx);
+            while (line.firstChild) {
+                line.removeChild(line.firstChild);
+            }
+
+            var doughnut = document.getElementById('doughnutChart'+this.idx);
+            while (doughnut.firstChild) {
+                doughnut.removeChild(doughnut.firstChild);
+            }
+
         },
         createCanvas() {
             var canvas = document.createElement("canvas");
