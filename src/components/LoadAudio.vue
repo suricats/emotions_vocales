@@ -13,15 +13,6 @@
 
 
 <script>
-import anger1 from '../assets/audio/anger9.wav'
-import anger2 from '../assets/audio/anger10.wav'
-import anger3 from '../assets/audio/anger11.wav'
-import sad1 from '../assets/audio/sad8.wav'
-import sad2 from '../assets/audio/sad10.wav'
-import joy1 from '../assets/audio/joy5.wav'
-import joy2 from '../assets/audio/joy7.wav'
-import joy3 from '../assets/audio/joy8.wav'
-import discours from '../assets/audio/discours.wav'
 
 import AudioList from '@/components/AudioList.vue'
 import AudioPlayer from '@/components/AudioPlayer.vue'
@@ -48,7 +39,6 @@ export default {
     },
     methods: {
         audioRecorded(audio) {
-            console.log(audio)
             this.showListMSodal = false
 
             var ComponentClass = Vue.extend(Analyser)
@@ -97,15 +87,13 @@ export default {
         async success(wavFile) {
             var blob = new Blob([wavFile], {type: 'audio/wav'});
 
-            console.log(URL.createObjectURL(blob))
-
-
             var formData = new FormData();
 
             formData.append("wav", this.blobToFile(blob, "audio"));
             formData.append("apikey", process.env.VUE_APP_API_KEY);
 
             try {
+                console.log(process.env.VUE_APP_API_URL)
                 const response = await this.$http.post('',formData)
                 this.initialize(response.data)
             } catch (e) {

@@ -39,7 +39,7 @@ export default {
     },
     methods: {
         verifyFile() {
-            const audioInput = document.getElementById("loadFile");;
+            const audioInput = document.getElementById("loadFile");
 
             if (audioInput.value != '' && audioInput.value != undefined && audioInput.files) {
                 var fReader = new FileReader();
@@ -99,6 +99,7 @@ export default {
             formData.append("apikey", process.env.VUE_APP_API_KEY);
 
             try {
+                console.log(process.env.VUE_APP_API_URL)
                 const response = await this.$http.post('',formData)
                 this.initialize(response.data)
             } catch (e) {
@@ -131,7 +132,7 @@ export default {
 
                 await wavFile.slice(sStart, sRead, this.success);
                 await this.sleep(5000)
-                
+
                 sStart = sStart + sRead
             }
         },

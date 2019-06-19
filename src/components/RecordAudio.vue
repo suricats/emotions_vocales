@@ -20,6 +20,7 @@
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import Analyser from '@/components/Analyser.vue'
 import Vue from 'vue'
+import jsonp from 'jsonp';
 
 export default {
     props: ['idx'],
@@ -134,6 +135,7 @@ export default {
             formData.append("apikey", process.env.VUE_APP_API_KEY);
 
             try {
+                console.log(process.env.VUE_APP_API_URL)
                 const response = await this.$http.post('',formData)
                 this.initialize(response.data)
             } catch (e) {
