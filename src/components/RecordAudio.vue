@@ -145,7 +145,6 @@ export default {
             formData.append("apikey", process.env.VUE_APP_API_KEY);
 
             try {
-                console.log(process.env.VUE_APP_API_URL)
                 const response = await this.$http.post('',formData)
                 this.initialize(response.data)
             } catch (e) {
@@ -166,9 +165,15 @@ body {
 
 .record-container {
     display: flex;
-    align-items: column;
+    flex-direction: row;
     justify-content: center;
-    height: 300px;
+    align-items: center;
+}
+
+@media screen and (max-width: 600px) {
+  .record-container {
+    flex-direction: column;
+  }
 }
 
 .btn-record {
@@ -178,6 +183,14 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+@media screen and (max-width: 600px) {
+.btn-record {
+    margin-top: 30px;
+    border-radius: 50%;
+    width: 100%;
+}
 }
 
 .recording {
@@ -191,10 +204,17 @@ body {
     border: 2px solid #009157;
     height: 120px;
     width: 120px;
+
+}
+
+@media screen and (max-width: 600px) {
+  .img-record {
+      height: 90px;
+      width: 90px;
+  }
 }
 
 .player-wrapper {
-    margin-left: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -208,10 +228,24 @@ body {
     justify-content: center;
 }
 
+@media screen and (max-width: 600px) {
+    .result-container {
+        margin-top: 30px;
+        border-radius: 50%;
+        width: 100%;
+    }
+}
+
 .analyse-container {
-    margin-left: 30px;
-    width: 700px;
+    width: 90%;
     height: 250px;
     background-color: #ededed;
+}
+@media screen and (max-width: 600px) {
+    .analyse-container {
+        width: 90%;
+        height: 450px;
+        background-color: #ededed;
+    }
 }
 </style>

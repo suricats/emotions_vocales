@@ -38,18 +38,15 @@ export default {
     created() {
         window.eventBus.$on('add-card', value => {
             this.idx += 1
-            console.log('receive event bus add card ' + this.type + ' idx = ' + this.idx)
         }),
         window.eventBus.$on('delete-card', value => {
             if (value < this.idx) {
                 this.idx -= 1
-                console.log('receive event bus delete card ' + this.type + ' idx = ' + this.idx)
             }
         })
     },
     methods: {
         onDelete (event) {
-            console.log('delete ' + this.idx)
             this.delete(this.idx)
         },
         createAnalyser() {

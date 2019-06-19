@@ -7,8 +7,10 @@ import store from './store'
 import 'vuetify/dist/vuetify.min.css'
 
 Vue.config.productionTip = false
+
 Vue.use(axios)
 Vue.use(Vuetify)
+
 
 window.eventBus = new Vue({})
 

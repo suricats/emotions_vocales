@@ -5,7 +5,7 @@
             <img id="play" class="icon" :src="'pause.png'" v-on:click="pauseAudio"/>
         </div>
         <div>
-            <img id="pause" class="icon" :src="'play.png'" v-on:click="playAudio">
+            <img id="pause" class="icon" :src="'play.png'" v-on:click="playAudio"/>
         </div>
         <div id="sound-line" class="sound-line">
             <v-slider
@@ -14,7 +14,8 @@
                 min=0
             ></v-slider>
         </div>
-        <div id="sound-duration">
+        <div>
+            <img id="download" class="icon" :src="'download.png'" v-on:click="downloadAudio"/>
         </div>
     </div>
 </template>
@@ -45,7 +46,23 @@ export default {
         },
         pauseAudio() {
             this.audioObject.pause()
-        }
+        },
+        download(filename, src) {
+            this.$http.get(src, { responseType: 'blob' })
+                .then(({ data }) => {
+                    let blob = new Blob([data], { type: 'audio/wav' })
+                    let link = document.createElement('a')
+                    link.href = window.URL.createObjectURL(blob)
+                    link.download = filename
+                    link.click()
+                .catch(error => {
+                    console.error(error)
+                })
+            })
+        },
+        downloadAudio() {
+            this.download("audio.wav", this.audioObject.src);
+        } 
     }
 }
 </script>
@@ -58,6 +75,7 @@ export default {
 }
 
 .icon {
+    margin-left: 5px;
     float: left;
     width: 30px;
 }

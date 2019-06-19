@@ -140,6 +140,14 @@ export default {
     margin-right: 30px;
 }
 
+
+@media screen and (max-width: 600px) {
+    #audio-list {
+        width: 100%;
+        margin-left: 0px;
+    }
+}
+
 .audio-item {
     border-bottom: 2px solid #727272;
     margin-top: 10px;

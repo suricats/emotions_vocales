@@ -103,7 +103,6 @@ export default {
             formData.append("apikey", process.env.VUE_APP_API_KEY);
 
             try {
-                console.log(process.env.VUE_APP_API_URL)
                 const response = await this.$http.post('',formData)
                 this.initialize(response.data)
             } catch (e) {
@@ -160,28 +159,6 @@ body {
   height: 100%;
 }
 
-.title-container {
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.load-title {
-    font-size: 30px;
-    margin-top: 30px;
-    text-align: center;
-    color: #008991
-}
-
-.title-secondary {
-    text-align: left;
-    margin-top: 50px;
-    width : 70%;
-    color: #535353;
-}
-
-
 .submit-container {
     display: flex;
     align-items: center;
@@ -208,6 +185,13 @@ body {
     margin-left: 30px;
 }
 
+@media screen and (max-width: 600px) {
+    #audio-list {
+        width: 80%;
+        margin-left: 5px;
+    }
+}
+
 .audio-item {
     border-bottom: 2px solid #727272;
     margin-top: 10px;
@@ -215,8 +199,8 @@ body {
     list-style-type: none;
     font-size: 15px;
 }
+
 .player-wrapper {
-    margin-left: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -227,5 +211,33 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.result-container {
+        margin-top: 30px;
+        border-radius: 50%;
+        width: 80%;
+}
+
+@media screen and (max-width: 600px) {
+    .result-container {
+        margin-top: 30px;
+        border-radius: 50%;
+        width: 100%;
+    }
+}
+
+.analyse-container {
+    width: 90%;
+    height: 250px;
+    background-color: #ededed;
+}
+
+@media screen and (max-width: 600px) {
+    .analyse-container {
+        width: 90%;
+        height: 450px;
+        background-color: #ededed;
+    }
 }
 </style>

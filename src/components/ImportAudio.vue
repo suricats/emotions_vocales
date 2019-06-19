@@ -99,7 +99,6 @@ export default {
             formData.append("apikey", process.env.VUE_APP_API_KEY);
 
             try {
-                console.log(process.env.VUE_APP_API_URL)
                 const response = await this.$http.post('',formData)
                 this.initialize(response.data)
             } catch (e) {
@@ -166,17 +165,26 @@ body {
     width: 20%;
 }
 
+@media screen and (max-width: 600px) {
+    .import-container {
+        width: 100%;
+    }
+}
+
+
 .import-audio-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 300px;
 }
 
-#audio-list {
-    width: 30%;
-    margin-left: 30px;
+
+@media screen and (max-width: 600px) {
+    .import-audio-container {
+        flex-direction: column;
+    }
 }
+
 
 .audio-item {
     border-bottom: 2px solid #727272;
@@ -186,7 +194,6 @@ body {
     font-size: 15px;
 }
 .player-wrapper {
-    margin-left: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -200,16 +207,31 @@ body {
 }
 
 .analyse-container {
-    margin-left: 30px;
-    width: 700px;
+    width: 80%;
     height: 250px;
     background-color: #ededed;
 }
 
+@media screen and (max-width: 600px) {
+    .analyse-container {
+        width: 90%;
+        height: 450px;
+        background-color: #ededed;
+    }
+}
+
 .result-container {
-    width: 80%;
+    width: 90%;
     display: flex;
     align-items: row;
     justify-content: center;
+}
+
+@media screen and (max-width: 600px) {
+    .result-container {
+        margin-top: 30px;
+        border-radius: 50%;
+        width: 100%;
+    }
 }
 </style>

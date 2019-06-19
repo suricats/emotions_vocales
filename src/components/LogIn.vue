@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie';
+
 export default {
     data: function () {
         return {
@@ -18,9 +20,8 @@ export default {
         SubmitMdp() {
             const mdp = document.getElementById("mdp-input");;
             //if (mdp.value === process.env.VUE_APP_MDP) {
-                console.log("ok")
-                this.$store.commit('login')
-                console.log(this.$store.state.logged)
+            Cookies.set('logged', true)
+            this.$store.commit('login')
             //}
         }
     },

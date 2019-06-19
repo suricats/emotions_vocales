@@ -1,6 +1,6 @@
 
 <template>
-    <div class="sparkline-container">
+    <div class="sparkline-container" id="sparkline-container">
         <div class="line-chart" ref="linecontainer">
         </div>
         <div class="doughnut-chart" ref="doughnutcontainer">
@@ -55,11 +55,18 @@ export default {
 
         },
         createCanvas() {
+
             var canvas = document.createElement("canvas");
+            console.log(screen.width)
+            if (screen.width < 600) {
+                canvas.height = '400'
+            } else {
+                canvas.height = '200';
+            }
             canvas.width = '400';
-            canvas.height = '200';
             canvas.id = 'lineChart'+ this.idx
             this.$refs.linecontainer.appendChild(canvas);
+
 
             var canvasDoughnut = document.createElement("canvas");
             canvasDoughnut.width = '200';
@@ -189,7 +196,7 @@ export default {
 <style>
 
 .sparkline-container {
-    width: 700px;
+    width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -198,14 +205,38 @@ export default {
 
 }
 
+@media screen and (max-width: 600px) {
+    .sparkline-container {
+        width: 90%;
+        display: flex;
+        align-self: center;
+        flex-direction: column;
+        justify-content: center;
+        align-content: center;
+        align-items: center;
+    }
+}
+
+
 .line-chart {
-    width: 400px;
+    width: 70%;
     height: 200px;
 }
 
 .doughnut-chart {
-    width: 200px;
+    width: 30%;
     height: 200px;
+}
+
+@media screen and (max-width: 600px) {
+    .line-chart {
+        width: 100%;
+        height: 200px;
+    }
+    .doughnut-chart {
+        width: 100%;
+        height: 200px;
+    }
 }
 
 </style>

@@ -108,6 +108,15 @@ export default {
     align-content: center;
 }
 
+
+@media screen and (max-width: 600px) {
+  .main-divider {
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+  }
+}
+
 a {
     text-decoration: none;
     color: #008991;
