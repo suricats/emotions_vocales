@@ -1,7 +1,7 @@
 <template>
     <div class="card">
         <div class="first-row">
-            <h3 class="card-title"> {{type}} {{idx}} </h3>
+            <input type="text" class="card-title" id="card-title" :value="type + ' ' + idx"> </input>
             <div>
                 <img class="img-delete" v-on:click="onDelete" :src="'x-button.png'">
                 <img v-if="isShowed" class="img-open" v-on:click="isShowed = false" :src="'down-button.png'">
@@ -36,6 +36,13 @@ export default {
        this.createAnalyser()
     },
     created() {
+        window.eventBus.$on('update-name', object => {
+            console.log(object)
+            if (object.idx === this.idx) {
+                console.log("update title")
+                document.getElementById("card-title").value = object.name;
+            }
+        }),
         window.eventBus.$on('add-card', value => {
             this.idx += 1
         }),
@@ -68,6 +75,10 @@ export default {
 </script>
 
 <style>
+
+.container {
+
+}
 .card {
     width: 70%;
     position: relative;
@@ -93,9 +104,11 @@ export default {
 }
 
 .card-title {
+    font-weight: bold;
     margin-top: 10px;
     color: #008991;
     margin-left: 20px;
+    font-size: 1.2em;
 }
 
 .img-open {

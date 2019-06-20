@@ -1,7 +1,7 @@
 <template>
-    <div>
-    <audio-list v-show="showListMSodal" v-on:close="audioRecorded"/>
-        <div class="result-container">
+    <div class="load-audio-container">
+        <audio-list v-show="showListMSodal" v-on:close="audioRecorded"/>
+        <div v-show="!showListMSodal" class="result-container">
             <div class="analyse-container" id="analyser-container" ref="container">
             </div>
             <div id="audio" class="player-wrapper">
@@ -49,6 +49,9 @@ export default {
     },
     methods: {
         audioRecorded(audio) {
+            console.log(audio)
+            window.eventBus.$emit('update-name', {name: audio.firstChild.data, idx: this.idx})
+
             this.showListMSodal = false
 
             var ComponentClass = Vue.extend(Analyser)
@@ -157,6 +160,12 @@ export default {
 html,
 body {
   height: 100%;
+}
+
+.load-audio-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;  
 }
 
 .submit-container {

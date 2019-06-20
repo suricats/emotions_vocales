@@ -48,13 +48,16 @@ export default {
             this.audioObject.pause()
         },
         download(filename, src) {
-            this.$http.get(src, { responseType: 'blob' })
+            this.$axios.get(src, { responseType: 'blob' })
                 .then(({ data }) => {
                     let blob = new Blob([data], { type: 'audio/wav' })
                     let link = document.createElement('a')
                     link.href = window.URL.createObjectURL(blob)
                     link.download = filename
-                    link.click()
+                    if (typeof InstallTrigger !== 'undefined') // Es qu'on est sur firefox ? 
+                        link.dispatchEvent(new MouseEvent(`click`, {bubbles: true, cancelable: true, view: window}));
+                    else
+                        link.click()
                 .catch(error => {
                     console.error(error)
                 })

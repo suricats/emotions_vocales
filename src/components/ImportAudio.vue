@@ -26,6 +26,7 @@ import Analyser from '@/components/Analyser.vue'
 import wav from '@/plugins/wav.js'
 
 export default {
+    props: ['idx'],
     data: function () {
         return {
             audioFile: Object,
@@ -37,6 +38,16 @@ export default {
         AudioPlayer,
         Analyser
     },
+    created() {
+        window.eventBus.$on('add-card', value => {
+            this.idx += 1
+        }),
+        window.eventBus.$on('delete-card', value => {
+            if (value < this.idx) {
+                this.idx -= 1
+            }
+        })
+    },    
     methods: {
         verifyFile() {
             const audioInput = document.getElementById("loadFile");
@@ -44,12 +55,14 @@ export default {
             if (audioInput.value != '' && audioInput.value != undefined && audioInput.files) {
                 var fReader = new FileReader();
                 fReader.readAsDataURL(audioInput.files[0]);
-                var that = this      
+                window.eventBus.$emit('update-name', {name: audioInput.files[0].name, idx: this.idx})
+                var that = this
                 fReader.onloadend = function(event){
                     that.audioUrl = event.target.result;
                     that.audio = new Audio(that.audioUrl);
                     that.$refs.player.audioRecorded(that.audio)
                     that.clean()
+
                     that.SimulateEmotions()
                 }
                 
@@ -207,7 +220,7 @@ body {
 }
 
 .analyse-container {
-    width: 80%;
+    width: 90%;
     height: 250px;
     background-color: #ededed;
 }
@@ -221,7 +234,7 @@ body {
 }
 
 .result-container {
-    width: 90%;
+    width: 80%;
     display: flex;
     align-items: row;
     justify-content: center;

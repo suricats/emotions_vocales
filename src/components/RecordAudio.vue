@@ -111,7 +111,6 @@ export default {
                 this.analyser.$mount() // pass nothing
                 this.$refs.container.appendChild(this.analyser.$el)
 
-
                 var that = this;
                 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
                 navigator.getUserMedia({
