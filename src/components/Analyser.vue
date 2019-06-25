@@ -1,14 +1,9 @@
 
 <template>
-    <div class="sparkline-container">
-        <div class="chart">
-            <canvas id="lineChart" width="100" height="100"></canvas>
+    <div class="sparkline-container" id="sparkline-container">
+        <div class="line-chart" ref="linecontainer">
         </div>
-        <div class="chart">
-            <canvas id="radarChart" width="100" height="100"></canvas>
-        </div>
-        <div class="chart">
-            <canvas id="doughnutChart" width="100" height="100"></canvas>
+        <div class="doughnut-chart" ref="doughnutcontainer">
         </div>
     </div>
 </template>
@@ -17,6 +12,7 @@
 <script>
 import Chart from 'chart.js';
 export default {
+    props: ['idx'],
     data: function () {
         return {
             calm : [0],
@@ -26,15 +22,60 @@ export default {
             energy : [0]
         }
     },
+    mounted() {
+        this.createCanvas()
+    },
+    created() {
+        window.eventBus.$on('add-card', value => {
+            this.idx += 1
+        }),
+        window.eventBus.$on('delete-card', value => {
+            if (value < this.idx) {
+                this.idx -= 1
+            }
+        })
+    },
     methods: {
         clean() {
-            this.calm = [0],
-            this.anger = [0],
-            this.joy = [0],
-            this.sorrow = [0],
+            this.calm = [0]
+            this.anger = [0]
+            this.joy = [0]
+            this.sorrow = [0]
             this.energy = [0]
+
+            var line = document.getElementById('lineChart'+this.idx);
+            while (line.firstChild) {
+                line.removeChild(line.firstChild);
+            }
+
+            var doughnut = document.getElementById('doughnutChart'+this.idx);
+            while (doughnut.firstChild) {
+                doughnut.removeChild(doughnut.firstChild);
+            }
+
+        },
+        createCanvas() {
+
+            var canvas = document.createElement("canvas");
+            if (screen.width < 600) {
+                canvas.height = '400'
+            } else {
+                canvas.height = '200';
+            }
+            canvas.width = '400';
+            canvas.id = 'lineChart'+ this.idx
+            this.$refs.linecontainer.appendChild(canvas);
+
+
+            var canvasDoughnut = document.createElement("canvas");
+            canvasDoughnut.width = '200';
+            canvasDoughnut.height = '200';
+            canvasDoughnut.id = 'doughnutChart'+this.idx
+            this.$refs.doughnutcontainer.appendChild(canvasDoughnut);
+
         },
         initialize(jsonResult) {
+            
             this.calm.push(jsonResult.calm * 2);
             this.anger.push(jsonResult.anger * 2);
             this.joy.push(jsonResult.joy * 2);
@@ -44,11 +85,12 @@ export default {
             var label = []
             var idx = 0;
             while (idx < this.calm.length) {
-                label.push((idx * 5).toString())
+                label.push((idx * 3).toString())
                 idx = idx + 1;
             }
-            var ctx = document.getElementById('lineChart');
-            var datas = 
+            var ctx = document.getElementById('lineChart'+this.idx);
+
+
             new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -96,7 +138,6 @@ export default {
                     }
                 ]}
             });
-            var ctxRadar = document.getElementById('radarChart');
 
             var total = 0;
             for(var i = 0; i < this.calm.length; i++) {
@@ -110,8 +151,6 @@ export default {
             }
             var averageAnger = total / this.anger.length;
 
-            console.log(averageAnger)
-
             total = 0;
             for(var i = 0; i < this.joy.length; i++) {
                 total += this.joy[i];
@@ -124,33 +163,11 @@ export default {
             }
             var averageSorrow = total / this.sorrow.length;
 
-            console.log("Sorrow " + averageSorrow)
-
-            var myRadarChart = new Chart(ctxRadar, {
-                type: 'radar',
-                data: {
-                    labels: ['Calme', 'Colère', 'Joie', 'Tristesse'],
-                    datasets:
-                     [{
-                        label: 'Moyenne',
-                        data: [averageCalm, averageAnger, averageJoy, averageSorrow],
-                        backgroundColor: [
-                            'rgba(0, 100, 62, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(0, 100, 62, 1)'
-                        ]
-                     }]
-                }
-            });
-
-
-            var ctxDoughnut = document.getElementById('doughnutChart');
+            var ctxDoughnut = document.getElementById('doughnutChart'+this.idx);
 
             new Chart(ctxDoughnut, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Calme', 'Colère', 'Joie', 'Tristesse'],
                     datasets:
                      [{
                         label: 'Moyenne',
@@ -178,18 +195,47 @@ export default {
 <style>
 
 .sparkline-container {
-    width: 70%;
+    width: 100%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
     align-content: center;
     align-items: center;
 
 }
 
-.chart {
-    width: 600px;
-    height: 600px;
+@media screen and (max-width: 600px) {
+    .sparkline-container {
+        width: 90%;
+        display: flex;
+        align-self: center;
+        flex-direction: column;
+        justify-content: center;
+        align-content: center;
+        align-items: center;
+    }
+}
+
+
+.line-chart {
+    width: 70%;
+    height: 200px;
+}
+
+.doughnut-chart {
+    width: 30%;
+    height: 200px;
+}
+
+@media screen and (max-width: 600px) {
+    .line-chart {
+        width: 100%;
+        height: 200px;
+    }
+    .doughnut-chart {
+        width: 100%;
+        height: 200px;
+    }
 }
 
 </style>

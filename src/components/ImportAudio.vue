@@ -1,29 +1,21 @@
 <template>
     <div>
-        <h1 class="import-title">
-            Mon audio
-        </h1>
-        <div class="title-container">
-            <h3 class="title-secondary"> Un extrait de film ? Une discussion avec votre patron ? Importez le fichier audio de votre choix et annalyser le afin d'en connaitre les émotions vocales ! </h3>
-        </div>
-        <div class="load-audio-container">
-            <div id="audio" class="player-wrapper">
-                <audio-player ref="player"></audio-player>
-            </div>
-            <input id="loadFile" type="file"
+        <div class="import-audio-container">
+            <div class="import-container">
+                <input id="loadFile" type="file"
                 v-on:change="verifyFile"/>
-        </div>
-        <div class="submit-container" >
-            <button class="buton-validate" v-on:click="SimulateEmotions">
-                Annalyser
-            </button>
-        </div>
-        <div class="score-container">
-            <analyser ref="analyser"></analyser>
+            </div>
+            <div class="result-container">
+                <div class="analyse-container" id="analyser-container" ref="container">
+                    <analyser ref="analyser"/>
+                </div>
+                <div id="audio" class="player-wrapper">
+                    <audio-player ref="player"></audio-player>
+                </div>
+            </div>
         </div>
     </div>
 </template>
-
 
 <script>
 
@@ -34,6 +26,7 @@ import Analyser from '@/components/Analyser.vue'
 import wav from '@/plugins/wav.js'
 
 export default {
+    props: ['idx'],
     data: function () {
         return {
             audioFile: Object,
@@ -45,22 +38,32 @@ export default {
         AudioPlayer,
         Analyser
     },
+    created() {
+        window.eventBus.$on('add-card', value => {
+            this.idx += 1
+        }),
+        window.eventBus.$on('delete-card', value => {
+            if (value < this.idx) {
+                this.idx -= 1
+            }
+        })
+    },    
     methods: {
         verifyFile() {
-            const audioInput = document.getElementById("loadFile");;
-
-            console.log(audioInput)
+            const audioInput = document.getElementById("loadFile");
 
             if (audioInput.value != '' && audioInput.value != undefined && audioInput.files) {
                 var fReader = new FileReader();
                 fReader.readAsDataURL(audioInput.files[0]);
-                var that = this      
+                window.eventBus.$emit('update-name', {name: audioInput.files[0].name, idx: this.idx})
+                var that = this
                 fReader.onloadend = function(event){
                     that.audioUrl = event.target.result;
                     that.audio = new Audio(that.audioUrl);
-                    console.log(audio)
                     that.$refs.player.audioRecorded(that.audio)
                     that.clean()
+
+                    that.SimulateEmotions()
                 }
                 
             }
@@ -103,9 +106,6 @@ export default {
         async success(wavFile) {
             var blob = new Blob([wavFile], {type: 'audio/wav'});
 
-            console.log(URL.createObjectURL(blob))
-
-
             var formData = new FormData();
 
             formData.append("wav", this.blobToFile(blob, "audio"));
@@ -127,14 +127,11 @@ export default {
             var sRead = 0;
             var duration;
             
-            console.log(this.audio)
-
             if (this.audio.duration === null || this.audio.duration === undefined || this.audio.duration > 30) {
                 duration = 5
             } else {
                 duration = this.audio.duration;
             }
-            console.log("duration : " + duration)
 
             while (sStart < duration) {     
                 if (sStart + 5 > duration) {
@@ -147,7 +144,7 @@ export default {
 
                 await wavFile.slice(sStart, sRead, this.success);
                 await this.sleep(5000)
-                console.log("start : " + sStart + " SRead : " + sRead)
+
                 sStart = sStart + sRead
             }
         },
@@ -170,60 +167,37 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
 
 html,
 body {
   height: 100%;
 }
 
-.title-container {
-    text-align: center;
+.import-container {
+    width: 20%;
+}
+
+@media screen and (max-width: 600px) {
+    .import-container {
+        width: 100%;
+    }
+}
+
+
+.import-audio-container {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.import-title {
-    font-size: 30px;
-    margin-top: 30px;
-    text-align: center;
-    color: #008991
+
+@media screen and (max-width: 600px) {
+    .import-audio-container {
+        flex-direction: column;
+    }
 }
 
-.title-secondary {
-    text-align: left;
-    margin-top: 50px;
-    width : 70%;
-    color: #535353;
-}
-
-
-.submit-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.buton-validate {
-    margin-top: 30px;
-    height: 30px;
-    width: 120px; 
-    background-color: #de1300;
-    color: #ffffff;
-    border-radius: 10%;
-}
-
-.load-audio-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#audio-list {
-    width: 30%;
-    margin-left: 30px;
-}
 
 .audio-item {
     border-bottom: 2px solid #727272;
@@ -233,7 +207,6 @@ body {
     font-size: 15px;
 }
 .player-wrapper {
-    margin-right: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -244,5 +217,34 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.analyse-container {
+    width: 90%;
+    height: 250px;
+    background-color: #ededed;
+}
+
+@media screen and (max-width: 600px) {
+    .analyse-container {
+        width: 90%;
+        height: 450px;
+        background-color: #ededed;
+    }
+}
+
+.result-container {
+    width: 80%;
+    display: flex;
+    align-items: row;
+    justify-content: center;
+}
+
+@media screen and (max-width: 600px) {
+    .result-container {
+        margin-top: 30px;
+        border-radius: 50%;
+        width: 100%;
+    }
 }
 </style>

@@ -5,41 +5,74 @@
         <h3 class="main-subtitle"> Par CATS </h3>
         <div class="main-divider">
             <div class="router-link">
-                <img class="logo" :src="'radio.png'"/>
-                <router-link to="/library">Choisissez parmis nos exemples de fichiers audio</router-link>
-                <p class="main-paraph">
-                    Au contraire vous n'avez pas d'inspriration ou vous doutez de vos talents d'acteur  ? Ne vous inquètez pas Nous avons sélectionné différents extraits pour que vous puissiez tester la reconnaissance d'émotions vocales.
-                </p>
+                <img class="logo" :src="'radio.png'" v-on:click="createInstance('Librairie')"/>
             </div>
             <div class="router-link">
-                <img class="logo" :src="'folder.png'"/>
-                <router-link to="/import">Téléchargez vos fichiers audio</router-link>
-                <p class="main-paraph">
-                    Vous avez une idée derrère la tête ? Vous pouvez utiliser les fichiers audio de votre choix pour tenter l'experience et annalyser les émotions tout au long de l'extrait.
-                </p>
+                <img class="logo" :src="'folder.png'" v-on:click="createInstance('Fichier Audio')"/>
             </div>
             <div class="router-link">
-                <img class="logo" :src="'micro.png'"/>
-                <router-link to="/record">Enregistrez vous et testez vos émotions</router-link>
-                <p class="main-paraph">
-                    Envie de tester vos talents d'acteur ? Enregistrez vous et constatez en direct  l'évolution de vos émotions !
-                </p>
+                <img class="logo" :src="'micro.png'" v-on:click="createInstance('Enregistrement')"/>
             </div>
-
+        </div>
+        <div class="result-container" ref="container">
         </div>
     </div>
 </template>
 
 
 <script>
+import AnalyseInstance from '@/components/AnalyseInstance.vue'
+import Vue from 'vue'
 export default {
+    props: ['type'],
     data: function () {
         return {
-            
+            instanceList: []
         }
     },
+    components: {
+        AnalyseInstance
+    },
+    mounted() {
+        this.createInstance(this.$route.query.type)
+    },
     methods: {
+        createInstance(typeRequested) {
+            window.eventBus.$emit('add-card')
 
+            for (var idxList = 0; idxList < this.instanceList.length; idxList++) {
+                this.instanceList[idxList].idx += 1;
+            }
+
+            var ComponentClass = Vue.extend(AnalyseInstance)
+            var instance = new ComponentClass({
+                propsData: { type: typeRequested, idx: 0, delete: this.deleteInstance}
+            })
+            instance.$mount() // pass nothing
+        
+            this.$refs.container.insertBefore(instance.$el, this.$refs.container.firstChild);
+
+            //this.$refs.container.appendChild(instance.$el)
+
+            var instanceObject = {}
+            instanceObject.idx = 0;//this.instanceList.length
+            instanceObject.instance = instance
+            this.instanceList.unshift(instanceObject)
+        },
+        deleteInstance(idx) {
+
+            this.instanceList[idx].instance.$destroy()
+            this.$refs.container.removeChild(this.instanceList[idx].instance.$el);
+            this.instanceList.splice(idx, 1)
+
+            for (var idxList = 0; idxList < this.instanceList.length; idxList++) {
+                if (this.instanceList[idxList].idx > idx) {
+                    this.instanceList[idxList].idx -= 1
+                }
+            }
+
+            window.eventBus.$emit('delete-card', idx)
+        }
     }
 }
 </script>
@@ -64,7 +97,16 @@ export default {
     margin-top: 50px;
     display: flex;
     justify-content: center;
-    align-content: flex-start;
+    align-content: center;
+}
+
+
+@media screen and (max-width: 600px) {
+  .main-divider {
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+  }
 }
 
 a {
@@ -80,6 +122,8 @@ a {
     font-size: 20px;
     color: #008991;
     display: flex;
+    align-items: center;
+    text-align: center;
     flex-direction: column;
   }
 
@@ -92,5 +136,13 @@ a {
 .logo {
     width: 128px;
     height: 128px;
+}
+
+.result-container {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
 }
 </style>

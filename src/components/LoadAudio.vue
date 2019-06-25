@@ -1,93 +1,67 @@
 <template>
-    <div>
-        <h1 class="load-title">
-            Notre librairie
-        </h1>
-        <div class="title-container">
-            <h3 class="title-secondary"> Nous avons séléctionné pour vous un ensemble d'éxtraits pour vous permettre de tester facilement la reconnaissance d'émotions vocales ! </h3>
-        </div>
-        <div class="load-audio-container">
+    <div class="load-audio-container">
+        <audio-list v-show="showListMSodal" v-on:close="audioRecorded"/>
+        <div v-show="!showListMSodal" class="result-container">
+            <div class="analyse-container" id="analyser-container" ref="container">
+            </div>
             <div id="audio" class="player-wrapper">
                 <audio-player ref="player"></audio-player>
             </div>
-            <ul id="audio-list">
-                <li v-for="audio in audioList" v-on:click="audioRecorded(audio)" class="audio-item">
-                    {{ audio.innerText }}
-                </li>
-            </ul>
-        </div>
-        <div class="submit-container" v-if="audioUrl">
-            <button class="buton-validate" v-on:click="SimulateEmotions">
-                Annalyser
-            </button>
-        </div>
-        <div class="score-container">
-            <analyser ref="analyser"></analyser>
         </div>
     </div>
 </template>
 
 
 <script>
-import anger1 from '../assets/audio/anger9.wav'
-import anger2 from '../assets/audio/anger10.wav'
-import anger3 from '../assets/audio/anger11.wav'
-import sad1 from '../assets/audio/sad8.wav'
-import sad2 from '../assets/audio/sad10.wav'
-import joy1 from '../assets/audio/joy5.wav'
-import joy2 from '../assets/audio/joy7.wav'
-import joy3 from '../assets/audio/joy8.wav'
-import discours from '../assets/audio/discours.wav'
 
-
+import AudioList from '@/components/AudioList.vue'
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import Analyser from '@/components/Analyser.vue'
 import wav from '@/plugins/wav.js'
+import Vue from 'vue'
 
 export default {
+    props: ['idx'],
     data: function () {
         return {
+            showListMSodal: true,
             audioFile: Object,
             audioUrl: "",
             audio: Object,
-            audioList: []
+            audioList: [],
+            analyser: null
         }
-    },
-    created: function() {
-        this.getAudios();
     },
     components: {
         AudioPlayer,
+        AudioList,
         Analyser
     },
+    created() {
+        window.eventBus.$on('add-card', value => {
+            this.idx += 1
+        }),
+        window.eventBus.$on('delete-card', value => {
+            if (value < this.idx) {
+                this.idx -= 1
+            }
+        })
+    },
     methods: {
-        getAudios() {
-            this.audioList.push(new Audio(anger1));
-            this.audioList[this.audioList.length - 1].innerText = "angry woman";
-            this.audioList.push(new Audio(anger2));
-            this.audioList[this.audioList.length - 1].innerText = "really angry woman";
-            this.audioList.push(new Audio(anger3));
-            this.audioList[this.audioList.length - 1].innerText = "over angry woman";
-
-            this.audioList.push(new Audio(sad1));
-            this.audioList[this.audioList.length - 1].innerText = "sad woman";
-            this.audioList.push(new Audio(sad2));
-            this.audioList[this.audioList.length - 1].innerText = "sad man";
-
-
-            this.audioList.push(new Audio(joy1));
-            this.audioList[this.audioList.length - 1].innerText = "happy man";
-            this.audioList.push(new Audio(joy2));
-            this.audioList[this.audioList.length - 1].innerText = "happy woman";
-            this.audioList.push(new Audio(joy3));
-            this.audioList[this.audioList.length - 1].innerText = "really happy man";
-
-            this.audioList.push(new Audio(discours));
-            this.audioList[this.audioList.length - 1].innerText = "discours de l'abée Pierre";
-        },
         audioRecorded(audio) {
+            window.eventBus.$emit('update-name', {name: audio.firstChild.data, idx: this.idx})
+
+            this.showListMSodal = false
+
+            var ComponentClass = Vue.extend(Analyser)
+            this.analyser = new ComponentClass({propsData: { idx: this.idx}})
+            this.analyser.$mount() // pass nothing
+            this.$refs.container.appendChild(this.analyser.$el)
+
+
             this.audioUrl = audio.src
             this.audio = new Audio(this.audioUrl);
+            this.SimulateEmotions()
             this.$refs.player.audioRecorded(this.audio)
             this.clean()
         },
@@ -117,16 +91,13 @@ export default {
             return new Blob([ia], {type: 'audio/wav'});
         },
         initialize(data) {
-            this.$refs.analyser.initialize(data)
+            this.analyser.initialize(data)
         },
         clean() {
-            this.$refs.analyser.clean()
+            this.analyser.clean()
         },
         async success(wavFile) {
             var blob = new Blob([wavFile], {type: 'audio/wav'});
-
-            console.log(URL.createObjectURL(blob))
-
 
             var formData = new FormData();
 
@@ -183,34 +154,18 @@ export default {
     }
 }
 </script>
-<style>
+<style scoped>
 
 html,
 body {
   height: 100%;
 }
 
-.title-container {
-    text-align: center;
+.load-audio-container {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center;  
 }
-
-.load-title {
-    font-size: 30px;
-    margin-top: 30px;
-    text-align: center;
-    color: #008991
-}
-
-.title-secondary {
-    text-align: left;
-    margin-top: 50px;
-    width : 70%;
-    color: #535353;
-}
-
 
 .submit-container {
     display: flex;
@@ -238,6 +193,13 @@ body {
     margin-left: 30px;
 }
 
+@media screen and (max-width: 600px) {
+    #audio-list {
+        width: 80%;
+        margin-left: 5px;
+    }
+}
+
 .audio-item {
     border-bottom: 2px solid #727272;
     margin-top: 10px;
@@ -245,8 +207,8 @@ body {
     list-style-type: none;
     font-size: 15px;
 }
+
 .player-wrapper {
-    margin-left: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -257,5 +219,33 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.result-container {
+        margin-top: 30px;
+        border-radius: 50%;
+        width: 80%;
+}
+
+@media screen and (max-width: 600px) {
+    .result-container {
+        margin-top: 30px;
+        border-radius: 50%;
+        width: 100%;
+    }
+}
+
+.analyse-container {
+    width: 90%;
+    height: 250px;
+    background-color: #ededed;
+}
+
+@media screen and (max-width: 600px) {
+    .analyse-container {
+        width: 90%;
+        height: 450px;
+        background-color: #ededed;
+    }
 }
 </style>
