@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <navbar></navbar>
-    <log-in v-if="!logged && this.$store.state.logged" />
+    <log-in v-if="!logged && !this.$store.state.logged" />
     <router-view v-else></router-view>
   </v-app>
 </template>

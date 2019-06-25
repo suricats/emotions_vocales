@@ -58,25 +58,17 @@ export default {
             instanceObject.idx = 0;//this.instanceList.length
             instanceObject.instance = instance
             this.instanceList.unshift(instanceObject)
-
-            for (var idxList = 0; idxList < this.instanceList.length; idxList++) {
-                console.log('card ' + this.instanceList[idxList].instance.type + ' idx = ' + this.instanceList[idxList].idx)
-            }
         },
         deleteInstance(idx) {
 
-            console.log('idx to delete ' + idx)
-            console.log('delete '+ this.instanceList[idx].instance.type + ' idx = ' + this.instanceList[idx].idx)
             this.instanceList[idx].instance.$destroy()
             this.$refs.container.removeChild(this.instanceList[idx].instance.$el);
             this.instanceList.splice(idx, 1)
 
-            console.log('after delete')
             for (var idxList = 0; idxList < this.instanceList.length; idxList++) {
                 if (this.instanceList[idxList].idx > idx) {
                     this.instanceList[idxList].idx -= 1
                 }
-                console.log('card ' + this.instanceList[idxList].instance.type + ' idx = ' + this.instanceList[idxList].idx)
             }
 
             window.eventBus.$emit('delete-card', idx)

@@ -57,7 +57,6 @@ export default {
         createCanvas() {
 
             var canvas = document.createElement("canvas");
-            console.log(screen.width)
             if (screen.width < 600) {
                 canvas.height = '400'
             } else {

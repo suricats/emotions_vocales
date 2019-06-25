@@ -49,7 +49,6 @@ export default {
     },
     methods: {
         audioRecorded(audio) {
-            console.log(audio)
             window.eventBus.$emit('update-name', {name: audio.firstChild.data, idx: this.idx})
 
             this.showListMSodal = false

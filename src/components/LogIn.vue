@@ -19,10 +19,10 @@ export default {
     methods: {
         SubmitMdp() {
             const mdp = document.getElementById("mdp-input");;
-            //if (mdp.value === process.env.VUE_APP_MDP) {
-            Cookies.set('logged', true)
-            this.$store.commit('login')
-            //}
+            if (mdp.value === process.env.VUE_APP_MDP) {
+                Cookies.set('logged', true)
+                this.$store.commit('login')
+            }
         }
     },
 }
