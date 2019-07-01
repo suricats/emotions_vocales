@@ -1,7 +1,7 @@
 <template>
     <div class="card">
         <div class="first-row">
-            <input type="text" class="card-title" id="card-title" :value="type + ' ' + idx"> </input>
+            <input type="text" class="card-title" id="card-title" :value="title"> </input>
             <div>
                 <img class="img-delete" v-on:click="onDelete" :src="'x-button.png'">
                 <img v-if="isShowed" class="img-open" v-on:click="isShowed = false" :src="'down-button.png'">
@@ -24,7 +24,8 @@ export default {
     props: ['type', 'idx', 'delete'],
     data: function () {
         return {
-            isShowed: true
+            isShowed: true,
+            title: ''
         }
     },
     components: {
@@ -37,10 +38,8 @@ export default {
     },
     created() {
         window.eventBus.$on('update-name', object => {
-            console.log(object)
             if (object.idx === this.idx) {
-                console.log("update title")
-                document.getElementById("card-title").value = object.name;
+                this.title = object.name;
             }
         }),
         window.eventBus.$on('add-card', value => {
@@ -68,6 +67,8 @@ export default {
             var instance = new ComponentClass({propsData: { idx: this.idx}})
             instance.$mount() // pass nothing
             this.$refs.container.appendChild(instance.$el)
+
+            this.title = this.type + ' ' + this.idx
         }
 
     }

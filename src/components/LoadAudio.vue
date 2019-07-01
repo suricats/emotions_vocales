@@ -143,10 +143,6 @@ export default {
             this.audio.play()
             var that = this
 
-            var sStart = 0;
-            var sRead = 0;
-            var duration = this.audio.duration
-
             wavFile.onloadend = function () {
                 that.SliceWav(this)
             };

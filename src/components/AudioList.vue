@@ -9,8 +9,9 @@
       <div class="modal-body">
         <div name="body">
             <ul id="audio-list">
-                <li v-for="audio in audioList" v-on:click="audioSelected(audio)" class="audio-item">
-                    {{ audio.innerText }}
+                <li v-for="audioElem in audioList" v-on:click="audioSelected(audioElem)" class="audio-item">
+                    <div v-if="audioElem === audio" class="selected-audio">{{ audioElem.innerText }}</div>
+                    <div v-else > {{ audioElem.innerText }} </div>  
                 </li>
             </ul>        
         </div>
@@ -46,6 +47,13 @@ export default {
     },
     created: function() {
         this.getAudios();
+    },
+    computed: {
+        isSelected: function (audioElem) {
+            return {
+                active: audioElem === this.audio
+            }
+        }
     },
     methods: {
         getAudios() {
@@ -160,5 +168,10 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.selected-audio {
+    color: #008881;
+    font-weight: bold;
 }
 </style>

@@ -20,7 +20,6 @@
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import Analyser from '@/components/Analyser.vue'
 import Vue from 'vue'
-import jsonp from 'jsonp';
 
 export default {
     props: ['idx'],
