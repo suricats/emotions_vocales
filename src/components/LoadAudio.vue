@@ -70,6 +70,11 @@ export default {
             theBlob.name = fileName;
             return theBlob;
         },
+        stopAudio() {
+            if (this.audio.src) {
+                this.audio.pause()
+            }
+        },
         // This funtion was totally stolen (or collectivized according to your political opinion)
         dataURItoBlob(dataURI) {
             // convert base64/URLEncoded data component to raw binary data held in a string

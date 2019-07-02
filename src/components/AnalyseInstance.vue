@@ -25,7 +25,8 @@ export default {
     data: function () {
         return {
             isShowed: true,
-            title: ''
+            title: '',
+            cardInstance: null
         }
     },
     components: {
@@ -53,6 +54,7 @@ export default {
     },
     methods: {
         onDelete (event) {
+            this.cardInstance.stopAudio()
             this.delete(this.idx)
         },
         createAnalyser() {
@@ -65,7 +67,9 @@ export default {
                 ComponentClass = Vue.extend(LoadAudio)
             }
             var instance = new ComponentClass({propsData: { idx: this.idx}})
-            instance.$mount() // pass nothing
+            instance.$mount()
+
+            this.cardInstance = instance
             this.$refs.container.appendChild(instance.$el)
 
             this.title = this.type + ' ' + this.idx
