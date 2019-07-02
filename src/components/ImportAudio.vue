@@ -2,7 +2,7 @@
     <div>
         <div class="import-audio-container">
             <div class="import-container">
-                <input id="loadFile" type="file"
+                <input class="input-file" id="loadFile" type="file"
                 v-on:change="verifyFile"/>
             </div>
             <div class="result-container">
@@ -234,6 +234,10 @@ body {
     display: flex;
     align-items: row;
     justify-content: center;
+}
+
+.input-file {
+    width: 100%;
 }
 
 @media screen and (max-width: 600px) {
