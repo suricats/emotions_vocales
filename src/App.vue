@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <navbar></navbar>
-    <log-in v-if="!logged && !this.$store.state.logged" />
+    <log-in v-if="isNotLogged" />
     <router-view v-else></router-view>
   </v-app>
 </template>
@@ -19,7 +19,11 @@ export default {
   },
   data () {
     return {
-      logged: Cookies.get('logged')
+    }
+  },
+  computed: {
+    isNotLogged() {
+      return (!Cookies.get('logged') && !this.$store.state.logged  ? true : false);
     }
   }
 }
