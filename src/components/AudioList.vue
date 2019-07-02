@@ -77,10 +77,17 @@ export default {
             this.audioList[this.audioList.length - 1].innerText = "discours de l'abée Pierre";
         },
         audioSelected(audio) {
+            console.log(audio)
+            if (this.audio.src) {
+                this.audio.pause()
+            }
             this.audio = audio
             audio.play()
         },
         closeModal() {
+            if (this.audio.src) {
+                this.audio.pause()
+            }
             this.$emit('close', this.audio)
         }
     }

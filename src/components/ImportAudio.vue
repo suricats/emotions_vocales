@@ -72,6 +72,11 @@ export default {
             document.querySelector('input').value = "";
             document.querySelector('input').files = ""
         },
+        stopAudio() {
+            if (this.audio.src) {
+                this.audio.pause()
+            }
+        },
         blobToFile(theBlob, fileName) {
             theBlob.lastModifiedDate = new Date();
             theBlob.name = fileName;

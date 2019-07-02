@@ -32,7 +32,8 @@ export default {
             blobs: [],
             start: null,
             recordedChunks: [],
-            analyser: null
+            analyser: null,
+            audio: null
         }
     },
     components: {
@@ -129,6 +130,11 @@ export default {
         },
         audioRecorded(audio) {
             this.$refs.player.audioRecorded(audio)
+        },
+        stopAudio() {
+            if (this.audio.src) {
+                this.audio.pause()
+            }
         },
         initialize(data) {
             this.analyser.initialize(data)
