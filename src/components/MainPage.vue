@@ -15,6 +15,9 @@
             </div>
         </div>
         <div class="result-container" ref="container">
+            <div v-if="instanceList.length === 0" class="empty-text">
+                Choisissez une des options ci-dessus pour lancer l'expérience
+            </div>
         </div>
     </div>
 </template>
@@ -144,5 +147,9 @@ a {
     align-items: center;
     flex-direction: column;
 
+}
+
+.empty-text {
+    margin-top: 50px;
 }
 </style>
