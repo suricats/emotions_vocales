@@ -3,6 +3,7 @@
         <div class="password-container">
             <label for="mdp">Mot de passe</label>
             <input id="mdp-input" class="mdp-input" name="mdp" type="text"/>
+            <p v-if="error" class="error-message">Mot de passe invalide</p>
         </div>
         <button class="button-validate" v-on:click="SubmitMdp"> Validate </button>
     </div>
@@ -14,6 +15,7 @@ import Cookies from 'js-cookie';
 export default {
     data: function () {
         return {
+            error: false
         }
     },
     methods: {
@@ -22,6 +24,8 @@ export default {
             if (mdp.value === process.env.VUE_APP_MDP) {
                 Cookies.set('logged', true)
                 this.$store.commit('login')
+            } else {
+                this.error = true
             }
         }
     },
@@ -36,6 +40,11 @@ export default {
     align-items: center;
     flex-direction: column;
 
+}
+
+.error-message {
+    margin-left: 10px;
+    color: #de1300;
 }
 
 .mdp-input {
