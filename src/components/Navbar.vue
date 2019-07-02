@@ -1,15 +1,19 @@
 <template>
     <nav class="navbar">
         <div class="navbar-content">
-            <a href="/" id="logo"></a>
-            <div class="navbar-fast-link">
-            </div>
+            <router-link to="/" class="logo-container">
+                <img  id="logo" src="../../public/logo.png"/>
+            </router-link>
         </div>
     </nav>
 </template>
 
 
-<style>
+<style scoped>
+
+.img {
+    border: 0px;
+}
 
 .navbar {
     background-color:  #ededed;
@@ -22,7 +26,7 @@
     height: 70px;
     width: 70%;
     display: flex;
-    justify-content: center;
+    justify-content: start;
 }
 
 
@@ -38,11 +42,13 @@
 }
 
 #logo {
-    margin-left: 10%;
-    background-image: url(../../public/logo.png);
     display: block;
-    width: 150px;
-    height: 150px;
+}
+
+.logo-container {
+    margin-left: 10%;
+    border: 0;
+    border: none;
 }
 
 </style>
