@@ -74,7 +74,7 @@ export default {
             this.audioList.push(new Audio(joy3));
             this.audioList[this.audioList.length - 1].innerText = "really happy man";
             this.audioList.push(new Audio(discours));
-            this.audioList[this.audioList.length - 1].innerText = "Abée Pierre pitch";
+            this.audioList[this.audioList.length - 1].innerText = "Abbé Pierre pitch";
         },
         audioSelected(audio) {
             this.audio = audio
