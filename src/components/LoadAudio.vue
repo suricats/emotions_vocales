@@ -71,7 +71,7 @@ export default {
             return theBlob;
         },
         stopAudio() {
-            if (this.audio.src) {
+            if (this.audio && this.audio.src) {
                 this.audio.pause()
             }
         },
