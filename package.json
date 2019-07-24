@@ -18,7 +18,9 @@
     "vue": "^2.6.10",
     "vue-router": "^3.0.6",
     "vuetify": "^1.5.14",
-    "vuex": "^3.1.1"
+    "vuex": "^3.1.1",
+    "wav-encoder": "^1.3.0",
+    "webaudioloader": "^1.0.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.8.0",
