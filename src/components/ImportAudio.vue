@@ -24,6 +24,7 @@
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import Analyser from '@/components/Analyser.vue'
 import wav from '@/plugins/wav.js'
+import resampler from '@/plugins/resampler.js'
 
 export default {
     props: ['idx'],
@@ -62,8 +63,12 @@ export default {
                     that.audio = new Audio(that.audioUrl);
                     that.$refs.player.audioRecorded(that.audio)
                     that.clean()
-
-                    that.SimulateEmotions()
+                    resampler(that.audioUrl, 11025, function(event){
+                        event.getFile(function(fileEvent){
+                            that.audioUrl = fileEvent
+                            that.SimulateEmotions()
+                        });
+                    });
                 }
                 
             }

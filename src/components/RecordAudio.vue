@@ -20,6 +20,7 @@
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import Analyser from '@/components/Analyser.vue'
 import Vue from 'vue'
+import resampler from '@/plugins/resampler.js'
 
 export default {
     props: ['idx'],
@@ -68,7 +69,6 @@ export default {
             that.blobs.push(blob)
             var audioUrl = URL.createObjectURL(blob);
 
-            const resampler = require('audio-resampler');
             resampler(audioUrl, 11025, function(event){
                 event.getFile(function(fileEvent){
                     that.SimulateEmotions(fileEvent)
@@ -89,7 +89,6 @@ export default {
             var blob = new Blob(this.recordedChunks)
             var audioUrl = URL.createObjectURL(blob);
 
-            const resampler = require('audio-resampler');
             var that = this;
             resampler(audioUrl, 11025, function(event){
                 event.getFile(function(fileEvent){
