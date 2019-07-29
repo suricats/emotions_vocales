@@ -1,0 +1,9 @@
+{
+  "build": {
+    "env": {
+      "VUE_APP_API_URL": "@vue_app_api_url",
+      "VUE_APP_API_KEY": "@vue_app_api_key",
+      "VUE_APP_MDP": "@vue_app_mdp"
+    }
+  }
+}
