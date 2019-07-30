@@ -55,21 +55,25 @@ export default {
 
         },
         createCanvas() {
-
             var canvas = document.createElement("canvas");
             if (screen.width < 600) {
-                canvas.height = '400'
+                canvas.height = '50%'
             } else {
-                canvas.height = '200';
+                canvas.height = '100%';
             }
-            canvas.width = '400';
+            canvas.width = '50%';
             canvas.id = 'lineChart'+ this.idx
             this.$refs.linecontainer.appendChild(canvas);
 
+            console.log(canvas.height)
 
             var canvasDoughnut = document.createElement("canvas");
-            canvasDoughnut.width = '200';
-            canvasDoughnut.height = '200';
+            if (screen.width < 600) {
+                canvasDoughnut.height = '50%'
+            } else {
+                canvasDoughnut.height = '100%';
+            }
+            canvasDoughnut.width = '50%';
             canvasDoughnut.id = 'doughnutChart'+this.idx
             this.$refs.doughnutcontainer.appendChild(canvasDoughnut);
 
@@ -195,6 +199,7 @@ export default {
 <style>
 
 .sparkline-container {
+    height: 100%;
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -206,7 +211,7 @@ export default {
 
 @media screen and (max-width: 600px) {
     .sparkline-container {
-        width: 90%;
+        width: 100%;
         display: flex;
         align-self: center;
         flex-direction: column;
